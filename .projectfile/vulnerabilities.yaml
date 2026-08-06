@@ -1,0 +1,20 @@
+---
+# SPDX-FileCopyrightText: 2026 Damián Búho <damian.buho@proton.me>
+#
+# SPDX-License-Identifier: MIT
+
+# project-local vulnerability suppressions. This image is nginx-based (it
+# extends o9s/nginx), so it carries nginx CVEs only — the golang.org/x/net ids
+# it once suppressed were over-suppression (this image ships no Go binary) and
+# have been removed. Fanned out to .trivyignore / .grype.yaml / osv-scanner.toml
+# by `pf-cli bridge` so trivy/grype/osv never disagree on whether a
+# known-blocked vuln gates publish. Add new ids in id order.
+
+org:
+  projectfile:
+    vulnerabilities:
+      suppress:
+        - id: CVE-2026-42055
+          reason: nginx ngx_http_proxy_v2/grpc heap buffer overflow; fixable only via upstream nginx release
+        - id: CVE-2026-42530
+          reason: nginx ngx_http_v3 vulnerability; fixable only via upstream nginx release

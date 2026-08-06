@@ -1,0 +1,53 @@
+{#
+SPDX-FileCopyrightText: 2026 Damián Búho <damian.buho@proton.me>
+
+SPDX-License-Identifier: MIT
+#}
+
+    proxy_cache proxy-cache;
+    proxy_cache_key "$scheme$proxy_host$request_uri";
+
+    add_header X-Cache-Status $upstream_cache_status always;
+
+    # ------------------------------------------------------------------
+    location / {
+        # Extract first path component as upstream domain
+        set $upstream_host "";
+        set $upstream_path "";
+        set $target "";
+
+        if ($uri ~ "^/([^/]+)(/.*)?$") {
+            set $upstream_host $1;
+            set $upstream_path $2;
+        }
+
+        if ($upstream_host = "") {
+            return 400;
+        }
+
+        add_header X-Cache-Status $upstream_cache_status always;
+        add_header X-Upstream-Host $upstream_host always;
+
+        # Build target URL
+        set $target "https://$upstream_host$upstream_path$is_args$args";
+        add_header X-Upstream-Target $target always;
+
+        proxy_pass $target;
+        proxy_set_header Host $proxy_host;
+
+        # Redirects get handled internally instead of passed to clients
+        error_page 301 302 303 307 308 = @redirect;
+    }
+
+    # ------------------------------------------------------------------
+    location @redirect {
+        internal;
+
+        set $new $upstream_http_location;
+        if ($new = "") { return 502; }
+
+        proxy_pass $new;
+        proxy_set_header Host $proxy_host;
+        add_header X-Cache-Status $upstream_cache_status always;
+        add_header X-Upstream-Redirect $new always;
+    }

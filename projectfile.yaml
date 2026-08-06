@@ -1,0 +1,51 @@
+---
+# SPDX-FileCopyrightText: 2026 Damián Búho <damian.buho@proton.me>
+#
+# SPDX-License-Identifier: MIT
+$schema: https://projectfile.org/schema/v1.json
+identity:
+  created: "2026-05-19"
+  name: http-cache
+  namespace: org.r8e
+  summary: R8E custom distribution of Nginx-based generic HTTP caching proxy
+  title: R8E / HTTP Cache (unofficial b19-style image)
+includes:
+  - .makefile/b19/ci.yaml
+  - .projectfile/vulnerabilities.yaml
+  - https://kiota.ch/damian-buho/metadata/raw/branch/main/include.yaml
+  - https://kiota.ch/r8e/metadata/raw/branch/main/include.yaml
+kind: SoftwareSourceCode
+links:
+  - label: R8E / HTTP Cache (unofficial b19-style image) on Codeberg
+    type: source-code
+    url: https://codeberg.org/r8e/http-cache
+  - label: R8E / HTTP Cache (unofficial b19-style image) on GitHub
+    type: source-code
+    url: https://github.com/damian-buho/r8e-http-cache
+  - label: R8E / HTTP Cache (unofficial b19-style image) on kiota.ch
+    type: source-code
+    url: https://kiota.ch/r8e/http-cache
+  - label: Issues on Codeberg
+    type: bugs
+    url: https://codeberg.org/r8e/http-cache/issues
+  - label: Issues on GitHub
+    type: bugs
+    url: https://github.com/damian-buho/r8e-http-cache/issues
+org:
+  projectfile:
+    conventions:
+      fragments:
+        parents:
+          - url: ssh://git@kiota.ch/b19/ubuntu.git
+    status: maintained
+repositories:
+  - issues: true
+    role: mirror
+    type: git
+    url: ssh://git@codeberg.org/r8e/http-cache.git
+  - role: mirror
+    type: git
+    url: git@github.com:damian-buho/r8e-http-cache.git
+  - role: origin
+    type: git
+    url: ssh://git@kiota.ch/r8e/http-cache.git
