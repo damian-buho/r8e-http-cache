@@ -6,9 +6,9 @@ $schema: https://projectfile.org/schema/v1.json
 identity:
   created: "2026-05-19"
   name: http-cache
-  namespace: org.r8e
-  summary: R8E custom distribution of Nginx-based generic HTTP caching proxy
+  summary: Community-maintained distribution of Nginx based on B19/Ubuntu
   title: R8E / HTTP Cache (unofficial b19-style image)
+  description: Community-maintained distribution of Nginx built on B19/Ubuntu. This repository holds only the packaging — Dockerfile, build scripts, and configuration, all MIT-licensed; the upstream Nginx is fetched at build time and retains its own licensing.
 includes:
   - .makefile/b19/ci.yaml
   - .projectfile/vulnerabilities.yaml
@@ -16,19 +16,47 @@ includes:
   - https://kiota.ch/r8e/metadata/raw/branch/main/include.yaml
 kind: SoftwareSourceCode
 links:
-  - label: R8E / HTTP Cache (unofficial b19-style image) on Codeberg
+  - label:
+      en: R8E / HTTP Cache (unofficial b19-style image) on Codeberg
+      es: R8E / HTTP Cache (unofficial b19-style image) en Codeberg
+      uk: R8E / HTTP Cache (unofficial b19-style image) на Codeberg
+    tags:
+      - public
+      - badges
+      - badges-gitea
     type: source-code
     url: https://codeberg.org/r8e/http-cache
-  - label: R8E / HTTP Cache (unofficial b19-style image) on GitHub
+  - label:
+      en: R8E / HTTP Cache (unofficial b19-style image) on GitHub
+      es: R8E / HTTP Cache (unofficial b19-style image) en GitHub
+      uk: R8E / HTTP Cache (unofficial b19-style image) на GitHub
+    tags:
+      - public
+      - badges
+      - badges-github
     type: source-code
     url: https://github.com/damian-buho/r8e-http-cache
-  - label: R8E / HTTP Cache (unofficial b19-style image) on kiota.ch
+  - label:
+      en: R8E / HTTP Cache (unofficial b19-style image) on kiota.ch
+      es: R8E / HTTP Cache (unofficial b19-style image) en kiota.ch
+      uk: R8E / HTTP Cache (unofficial b19-style image) на kiota.ch
+    preferred: true
     type: source-code
     url: https://kiota.ch/r8e/http-cache
-  - label: Issues on Codeberg
+  - label:
+      en: Issues on Codeberg
+      es: Incidencias en Codeberg
+      uk: Issues на Codeberg
+    tags:
+      - support
     type: bugs
     url: https://codeberg.org/r8e/http-cache/issues
-  - label: Issues on GitHub
+  - label:
+      en: Issues on GitHub
+      es: Incidencias en GitHub
+      uk: Issues на GitHub
+    tags:
+      - support
     type: bugs
     url: https://github.com/damian-buho/r8e-http-cache/issues
 org:
@@ -49,3 +77,12 @@ repositories:
   - role: origin
     type: git
     url: ssh://git@kiota.ch/r8e/http-cache.git
+keywords:
+  - nginx
+  - http-cache
+  - proxy
+  - cache
+  - reverse-proxy
+  - docker
+technologies:
+  - c
