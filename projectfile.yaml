@@ -6,9 +6,15 @@ $schema: https://projectfile.org/schema/v1.json
 identity:
   created: "2026-05-19"
   name: http-cache
-  summary: Community-maintained distribution of Nginx based on B19/Ubuntu
+  summary:
+    en: Community-maintained distribution of Nginx based on B19/Ubuntu
+    es: Distribución de Nginx mantenida por la comunidad, basada en B19/Ubuntu
+    uk: Дистрибуція Nginx з підтримкою спільноти на основі B19/Ubuntu
   title: R8E / HTTP Cache (unofficial b19-style image)
-  description: Community-maintained distribution of Nginx built on B19/Ubuntu. This repository holds only the packaging — Dockerfile, build scripts, and configuration, all MIT-licensed; the upstream Nginx is fetched at build time and retains its own licensing.
+  description:
+    en: Community-maintained distribution of Nginx built on B19/Ubuntu. This repository holds only the packaging — Dockerfile, build scripts, and configuration, all MIT-licensed; the upstream Nginx is fetched at build time and retains its own licensing.
+    es: Distribución de Nginx mantenida por la comunidad, construida sobre B19/Ubuntu. Este repositorio contiene únicamente el empaquetado — Dockerfile, scripts de compilación y configuración, todo con licencia MIT; el código original de Nginx se obtiene en tiempo de compilación y conserva su propia licencia.
+    uk: Дистрибуція Nginx з підтримкою спільноти, зібрана на основі B19/Ubuntu. Цей репозиторій містить лише пакування — Dockerfile, скрипти збирання та конфігурацію, усе під ліцензією MIT; вихідний код Nginx отримують під час збирання, і він зберігає власну ліцензію.
 includes:
   - .makefile/b19/ci.yaml
   - .projectfile/vulnerabilities.yaml
