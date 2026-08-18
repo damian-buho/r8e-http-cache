@@ -59,7 +59,7 @@ gpg --encrypt --armor --recipient B64C122EE16C3746 message.txt
 
 ## Bug Bounty
 
-R8E / HTTP Cache (unofficial b19-style image) does not currently run a bug bounty programme. We still welcome
+R8E / HTTP Cache does not currently run a bug bounty programme. We still welcome
 responsibly disclosed reports — see the contact channel above.
 
 ## Acknowledged Vulnerabilities
@@ -71,5 +71,3 @@ depends on an upstream release, or the advisory does not apply to this project):
 | --- | --- |
 | CVE-2026-42055 | nginx `ngx_http_proxy_v2/grpc` heap buffer overflow; fixable only via upstream nginx release |
 | CVE-2026-42530 | nginx ngx_http_v3 vulnerability; fixable only via upstream nginx release |
-
-*Generated from projectfile ([learn how](https://projectfile.org/how-to/security))*

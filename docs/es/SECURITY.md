@@ -60,7 +60,7 @@ gpg --encrypt --armor --recipient B64C122EE16C3746 message.txt
 
 ## Programa de recompensas
 
-R8E / HTTP Cache (unofficial b19-style image) no ofrece actualmente un programa de recompensas. Aun así
+R8E / HTTP Cache no ofrece actualmente un programa de recompensas. Aun así
 agradecemos los informes divulgados de forma responsable — consulta el canal de
 contacto anterior.
 
@@ -75,5 +75,4 @@ aplica a este proyecto):
 | CVE-2026-42055 | nginx `ngx_http_proxy_v2/grpc` heap buffer overflow; fixable only via upstream nginx release |
 | CVE-2026-42530 | nginx ngx_http_v3 vulnerability; fixable only via upstream nginx release |
 
-*Generado desde projectfile ([saber cómo](https://projectfile.org/how-to/security))*
 <!-- textlint-enable -->
