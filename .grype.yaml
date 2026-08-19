@@ -10,5 +10,5 @@
 # pf-cli-managed: yes
 
 ignore:
-  - vulnerability: CVE-2026-42055  # nginx ngx_http_proxy_v2/grpc heap buffer overflow; fixable only via upstream nginx release
+  - vulnerability: CVE-2026-42055  # nginx `ngx_http_proxy_v2/grpc` heap buffer overflow; fixable only via upstream nginx release
   - vulnerability: CVE-2026-42530  # nginx ngx_http_v3 vulnerability; fixable only via upstream nginx release
