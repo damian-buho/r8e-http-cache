@@ -26,7 +26,7 @@ SPDX-License-Identifier: MIT
     - `O9S_NGINX_PROXY_BUFFERS_NUM=32`, `O9S_NGINX_PROXY_BUFFERS_SIZE=64k`, `O9S_NGINX_PROXY_BUFFER_SIZE=16k`, `O9S_NGINX_PROXY_MAX_TEMP_FILE_SIZE=1024m`
     - `O9S_NGINX_PROXY_FORCE_RANGES=on`, `O9S_NGINX_PROXY_IGNORE_CLIENT_ABORT=on`, `O9S_NGINX_PROXY_INTERCEPT_ERRORS=on`, `O9S_NGINX_PROXY_SSL_SERVER_NAME=on`, `O9S_NGINX_RECURSIVE_ERROR_PAGES=on`
 
-## Inherited from B19/Ubuntu 1.4.1
+## Inherited from B19/Ubuntu
 
 ### Persistent APT cache across builds
 
@@ -93,7 +93,7 @@ SPDX-License-Identifier: MIT
 ### Feature toggles for all subsystems
 
 - Every major subsystem (entrypoint, healthchecks, bootstrap, tests, secrets, port validation, i18n, shell hooks) can be disabled at runtime via environment variables.
-- Individual entrypoint and bootstrap hooks can be skipped by name without disabling the whole subsystem.
+- Individual entrypoint, bootstrap and health-check hooks can be skipped by name without disabling the whole subsystem.
 - No image rebuild required — toggles are runtime-only.
 
 ### Built-in health monitoring (healthcheck.d)

@@ -28,7 +28,7 @@ SPDX-License-Identifier: MIT
     - `O9S_NGINX_PROXY_BUFFERS_NUM=32`, `O9S_NGINX_PROXY_BUFFERS_SIZE=64k`, `O9S_NGINX_PROXY_BUFFER_SIZE=16k`, `O9S_NGINX_PROXY_MAX_TEMP_FILE_SIZE=1024m`
     - `O9S_NGINX_PROXY_FORCE_RANGES=on`, `O9S_NGINX_PROXY_IGNORE_CLIENT_ABORT=on`, `O9S_NGINX_PROXY_INTERCEPT_ERRORS=on`, `O9S_NGINX_PROXY_SSL_SERVER_NAME=on`, `O9S_NGINX_RECURSIVE_ERROR_PAGES=on`
 
-## Heredado de B19/Ubuntu 1.4.1
+## Heredado de B19/Ubuntu
 
 ### Caché APT persistente entre compilaciones
 
@@ -95,7 +95,7 @@ SPDX-License-Identifier: MIT
 ### Conmutadores de funcionalidades para todos los subsistemas
 
 - Cada subsistema mayor (entrypoint, healthchecks, bootstrap, tests, secrets, validación de puertos, i18n, shell hooks) puede desactivarse en runtime mediante variables de entorno.
-- Los hooks individuales del entrypoint y del bootstrap pueden omitirse por nombre sin desactivar el subsistema entero.
+- Los hooks individuales del entrypoint, del bootstrap y de las comprobaciones de salud pueden omitirse por nombre sin desactivar el subsistema entero.
 - No hace falta reconstruir la imagen: los conmutadores son solo de runtime.
 
 ### Monitorización de estado integrada (healthcheck.d)

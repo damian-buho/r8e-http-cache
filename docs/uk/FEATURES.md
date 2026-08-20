@@ -28,7 +28,7 @@ SPDX-License-Identifier: MIT
     - `O9S_NGINX_PROXY_BUFFERS_NUM=32`, `O9S_NGINX_PROXY_BUFFERS_SIZE=64k`, `O9S_NGINX_PROXY_BUFFER_SIZE=16k`, `O9S_NGINX_PROXY_MAX_TEMP_FILE_SIZE=1024m`
     - `O9S_NGINX_PROXY_FORCE_RANGES=on`, `O9S_NGINX_PROXY_IGNORE_CLIENT_ABORT=on`, `O9S_NGINX_PROXY_INTERCEPT_ERRORS=on`, `O9S_NGINX_PROXY_SSL_SERVER_NAME=on`, `O9S_NGINX_RECURSIVE_ERROR_PAGES=on`
 
-## Успадковано від B19/Ubuntu 1.4.1
+## Успадковано від B19/Ubuntu
 
 ### Постійний APT-кеш між збираннями
 
@@ -95,7 +95,7 @@ SPDX-License-Identifier: MIT
 ### Перемикачі функцій для всіх підсистем
 
 - Кожну велику підсистему (entrypoint, healthchecks, bootstrap, тести, секрети, перевірку портів, i18n, shell-хуки) можна вимкнути під час виконання через змінні середовища.
-- Окремі хуки entrypoint і bootstrap можна пропустити за ім’ям, не вимикаючи всю підсистему.
+- Окремі хуки entrypoint, bootstrap і перевірок стану можна пропустити за ім’ям, не вимикаючи всю підсистему.
 - Перебудова образу не потрібна — перемикачі діють лише в рантаймі.
 
 ### Вбудований моніторинг стану (healthcheck.d)

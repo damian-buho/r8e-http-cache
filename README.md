@@ -20,7 +20,7 @@ Community-maintained distribution of Nginx based on B19/Ubuntu
 
 - Generic HTTP caching proxy
 
-### Inherited from B19/Ubuntu 1.4.1
+### Inherited from B19/Ubuntu
 
 - Persistent APT cache across builds
 - Service process management with log routing (b19-exec)
