@@ -15,6 +15,6 @@ org:
     vulnerabilities:
       suppress:
         - id: CVE-2026-42055
-          reason: nginx ngx_http_proxy_v2/grpc heap buffer overflow; fixable only via upstream nginx release
+          reason: nginx `ngx_http_proxy_v2/grpc` heap buffer overflow; fixable only via upstream nginx release
         - id: CVE-2026-42530
           reason: nginx ngx_http_v3 vulnerability; fixable only via upstream nginx release
