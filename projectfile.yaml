@@ -10,7 +10,7 @@ identity:
     en: Community-maintained distribution of Nginx based on B19/Ubuntu
     es: Distribución de Nginx mantenida por la comunidad, basada en B19/Ubuntu
     uk: Дистрибуція Nginx з підтримкою спільноти на основі B19/Ubuntu
-  title: R8E / HTTP Cache (unofficial b19-style image)
+  title: R8E / HTTP Cache
   description:
     en: Community-maintained distribution of Nginx built on B19/Ubuntu. This repository holds only the packaging — Dockerfile, build scripts, and configuration, all MIT-licensed; the upstream Nginx is fetched at build time and retains its own licensing.
     es: Distribución de Nginx mantenida por la comunidad, construida sobre B19/Ubuntu. Este repositorio contiene únicamente el empaquetado — Dockerfile, scripts de compilación y configuración, todo con licencia MIT; el código original de Nginx se obtiene en tiempo de compilación y conserva su propia licencia.
@@ -23,9 +23,9 @@ includes:
 kind: SoftwareSourceCode
 links:
   - label:
-      en: R8E / HTTP Cache (unofficial b19-style image) on Codeberg
-      es: R8E / HTTP Cache (unofficial b19-style image) en Codeberg
-      uk: R8E / HTTP Cache (unofficial b19-style image) на Codeberg
+      en: R8E / HTTP Cache on Codeberg
+      es: R8E / HTTP Cache en Codeberg
+      uk: R8E / HTTP Cache на Codeberg
     tags:
       - public
       - badges
@@ -33,9 +33,9 @@ links:
     type: source-code
     url: https://codeberg.org/r8e/http-cache
   - label:
-      en: R8E / HTTP Cache (unofficial b19-style image) on GitHub
-      es: R8E / HTTP Cache (unofficial b19-style image) en GitHub
-      uk: R8E / HTTP Cache (unofficial b19-style image) на GitHub
+      en: R8E / HTTP Cache on GitHub
+      es: R8E / HTTP Cache en GitHub
+      uk: R8E / HTTP Cache на GitHub
     tags:
       - public
       - badges
@@ -43,9 +43,9 @@ links:
     type: source-code
     url: https://github.com/damian-buho/r8e-http-cache
   - label:
-      en: R8E / HTTP Cache (unofficial b19-style image) on kiota.ch
-      es: R8E / HTTP Cache (unofficial b19-style image) en kiota.ch
-      uk: R8E / HTTP Cache (unofficial b19-style image) на kiota.ch
+      en: R8E / HTTP Cache on kiota.ch
+      es: R8E / HTTP Cache en kiota.ch
+      uk: R8E / HTTP Cache на kiota.ch
     preferred: true
     type: source-code
     url: https://kiota.ch/r8e/http-cache

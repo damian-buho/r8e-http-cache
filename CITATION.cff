@@ -9,7 +9,7 @@
 cff-version: 1.2.0
 message: Please cite this software using the metadata from this file.
 type: software
-title: R8E / HTTP Cache (unofficial b19-style image)
+title: R8E / HTTP Cache
 abstract: Community-maintained distribution of Nginx based on B19/Ubuntu
 authors:
   - family-names: Búho
