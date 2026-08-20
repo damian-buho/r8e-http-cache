@@ -1,22 +1,27 @@
 <!--
 SPDX-FileCopyrightText: 2026 Damián Búho <damian.buho@proton.me>
 SPDX-License-Identifier: MIT
+pf-cli-managed: yes
 -->
 
-<!-- pf-cli-managed: yes -->
-# R8E / HTTP Cache (unofficial b19-style image)
+[Español](docs/es/README.md) · [Українська](docs/uk/README.md)
 
-R8E custom distribution of Nginx-based generic HTTP caching proxy
+# R8E / HTTP Cache
 
-[![License](https://img.shields.io/badge/license-MIT-4c1?style=flat-square)](LICENSE) [![PRs welcome](https://img.shields.io/badge/PRs-welcome-4c1?style=flat-square)](CONTRIBUTING.md) [![REUSE compliance](https://api.reuse.software/badge/codeberg.org/r8e/http-cache)](https://api.reuse.software/info/codeberg.org/r8e/http-cache)
+Community-maintained distribution of Nginx based on B19/Ubuntu
 
-![Project status](https://img.shields.io/badge/status-maintained-1d63ed?style=flat-square) [![Last commit](https://img.shields.io/gitea/last-commit/r8e/http-cache?gitea_url=https://codeberg.org&style=flat-square)](https://codeberg.org/r8e/http-cache)
+[![Stand with Ukraine](https://raw.githubusercontent.com/vshymanskyy/StandWithUkraine/main/badges/StandWithUkraine.svg)](https://damian-buho.github.io/support-ukraine/) [![License](https://badges.kiota.ch/static/v1?label=license&message=MIT&color=4c1&style=flat-square)](LICENSE) ![Commit style](https://badges.kiota.ch/static/v1?label=commits&message=conventional&color=blue&style=flat-square) ![Workflow](https://badges.kiota.ch/static/v1?label=workflow&message=git-flow&color=blue&style=flat-square) ![Versioning](https://badges.kiota.ch/static/v1?label=versioning&message=semantic&color=blue&style=flat-square) [![PRs welcome](https://badges.kiota.ch/static/v1?label=PRs&message=welcome&color=4c1&style=flat-square)](CONTRIBUTING.md) [![Citation](https://badges.kiota.ch/static/v1?label=citation&message=cff&color=blue&style=flat-square)](CITATION.cff) [![REUSE compliance](https://api.reuse.software/badge/codeberg.org/r8e/http-cache)](https://api.reuse.software/info/codeberg.org/r8e/http-cache)
 
-[![Build status on kiota.ch](https://kiota.ch/r8e/http-cache/badges/workflows/published.yaml/badge.svg)](https://kiota.ch/r8e/http-cache/actions)
+![Project status](https://badges.kiota.ch/static/v1?label=status&message=maintained&color=1d63ed&style=flat-square) [![Last commit on kiota.ch](https://badges.kiota.ch/gitea/last-commit/r8e/http-cache?gitea_url=https://kiota.ch&style=flat-square)](https://kiota.ch/r8e/http-cache)
+
+[![Publish pipeline on kiota.ch](https://kiota.ch/r8e/http-cache/badges/workflows/published.yaml/badge.svg?style=flat-square)](https://kiota.ch/r8e/http-cache/actions) [![Vulnerability audit on kiota.ch](https://kiota.ch/r8e/http-cache/badges/workflows/audited.yaml/badge.svg?style=flat-square)](https://kiota.ch/r8e/http-cache/actions) [![Dependency freshness on kiota.ch](https://kiota.ch/r8e/http-cache/badges/workflows/check-outdated.yaml/badge.svg?style=flat-square)](https://kiota.ch/r8e/http-cache/actions) [![Analysis sweep on kiota.ch](https://kiota.ch/r8e/http-cache/badges/workflows/analyze.yaml/badge.svg?style=flat-square)](https://kiota.ch/r8e/http-cache/actions)
 
 ## Features
 
 - Generic HTTP caching proxy
+
+### Inherited from B19/Ubuntu 1.4.1
+
 - Persistent APT cache across builds
 - Service process management with log routing (b19-exec)
 - Cached artifact downloads with integrity verification (b19-fetch)
@@ -45,30 +50,61 @@ R8E custom distribution of Nginx-based generic HTTP caching proxy
 - Pre-installed utility tools
 - XDG Base Directory paths
 
-See [Features](FEATURES.md) for the full list.
+See [FEATURES.md](FEATURES.md) for the full list.
 
 ## What this provides
 
-- **Container image** `kiota.ch/r8e/http-cache:latest`
+- **Container image** `ghcr.io/damian-buho/r8e/http-cache:latest`
+- **Container image** `docker.io/damianbuho/r8e-http-cache:latest`
 
 ## Installation
 
 Pull the published container image:
 
+### Pull from GHCR
+
+```sh
+docker pull ghcr.io/damian-buho/r8e/http-cache:latest
+```
+
+### Pull from DockerHub
+
+```sh
+docker pull docker.io/damianbuho/r8e-http-cache:latest
+```
+
+Stable releases also publish `X.Y.Z`, `X.Y` and `X` tags — pull the precision you want to pin.
+
+If the registries above are unreachable, pull from the origin instead:
+
+### Pull from Kiota
+
 ```sh
 docker pull kiota.ch/r8e/http-cache:latest
 ```
 
+## Usage
+
+Bring the stack up locally:
+
+```sh
+make dc-up
+make dc-logs
+make dc-down
+```
+
 ## Building
 
-- [Makefile reference](docs/MAKEFILE.md)
+Run `make` with no arguments for the default target; run `make help` to list every target.
+
+For the local dev loop, `make dev-container` brings up the dev-container.
 
 Pipeline entry points:
 
 - `make analyze` — Run the heavy analysis sweep (mutation testing, benchmarks)
 - `make audited` — Re-scan the pinned dependencies and published artifacts for new vulnerabilities
 - `make check-outdated` — Report every pinned dependency that lags upstream
-- `make published` — Build, test, scan and publish the release artifacts
+- `make ready-to-publish` — Run the pseudo-CI pipeline locally — build, test and scan, without publishing
 
 ## Policies
 
@@ -76,16 +112,11 @@ Pipeline entry points:
 - [Security policy](SECURITY.md)
 - [Getting support](SUPPORT.md)
 - [Code of Conduct](CODE_OF_CONDUCT.md)
+- [AI and LLM Policy](AI_POLICY.md)
 
 ## Links
 
-### Project
-
-- [R8E / HTTP Cache (unofficial b19-style image) on Codeberg](https://codeberg.org/r8e/http-cache)
-- [R8E / HTTP Cache (unofficial b19-style image) on GitHub](https://github.com/damian-buho/r8e-http-cache)
-- [R8E / HTTP Cache (unofficial b19-style image) on kiota.ch](https://kiota.ch/r8e/http-cache)
-- [Issues on Codeberg](https://codeberg.org/r8e/http-cache/issues)
-- [Issues on GitHub](https://github.com/damian-buho/r8e-http-cache/issues)
+- [Projectfile Specification](https://projectfile.org)
 
 ## License
 

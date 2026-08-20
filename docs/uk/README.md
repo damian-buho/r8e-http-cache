@@ -8,46 +8,49 @@ pf-cli-managed: yes
 
 [English](../../README.md) · [Español](../es/README.md)
 
-# R8E / HTTP Cache (unofficial b19-style image)
+# R8E / HTTP Cache
 
 Дистрибуція Nginx з підтримкою спільноти на основі B19/Ubuntu
 
-[![Stand with Ukraine](https://raw.githubusercontent.com/vshymanskyy/StandWithUkraine/main/badges/StandWithUkraine.svg)](https://damian-buho.github.io/support-ukraine/) [![License](https://img.shields.io/static/v1?label=license&message=MIT&color=4c1&style=flat-square)](LICENSE) ![Commit style](https://img.shields.io/static/v1?label=commits&message=conventional&color=blue&style=flat-square) ![Workflow](https://img.shields.io/static/v1?label=workflow&message=git-flow&color=blue&style=flat-square) ![Versioning](https://img.shields.io/static/v1?label=versioning&message=semantic&color=blue&style=flat-square) [![PRs welcome](https://img.shields.io/static/v1?label=PRs&message=welcome&color=4c1&style=flat-square)](CONTRIBUTING.md) [![Citation](https://img.shields.io/static/v1?label=citation&message=cff&color=blue&style=flat-square)](CITATION.cff) [![REUSE compliance](https://api.reuse.software/badge/codeberg.org/r8e/http-cache)](https://api.reuse.software/info/codeberg.org/r8e/http-cache)
+[![Stand with Ukraine](https://raw.githubusercontent.com/vshymanskyy/StandWithUkraine/main/badges/StandWithUkraine.svg)](https://damian-buho.github.io/support-ukraine/) [![License](https://badges.kiota.ch/static/v1?label=license&message=MIT&color=4c1&style=flat-square)](LICENSE) ![Commit style](https://badges.kiota.ch/static/v1?label=commits&message=conventional&color=blue&style=flat-square) ![Workflow](https://badges.kiota.ch/static/v1?label=workflow&message=git-flow&color=blue&style=flat-square) ![Versioning](https://badges.kiota.ch/static/v1?label=versioning&message=semantic&color=blue&style=flat-square) [![PRs welcome](https://badges.kiota.ch/static/v1?label=PRs&message=welcome&color=4c1&style=flat-square)](CONTRIBUTING.md) [![Citation](https://badges.kiota.ch/static/v1?label=citation&message=cff&color=blue&style=flat-square)](CITATION.cff) [![REUSE compliance](https://api.reuse.software/badge/codeberg.org/r8e/http-cache)](https://api.reuse.software/info/codeberg.org/r8e/http-cache)
 
-![Project status](https://img.shields.io/static/v1?label=status&message=maintained&color=1d63ed&style=flat-square) [![Last commit](https://img.shields.io/gitea/last-commit/r8e/http-cache?gitea_url=https://codeberg.org&style=flat-square)](https://codeberg.org/r8e/http-cache)
+![Project status](https://badges.kiota.ch/static/v1?label=status&message=maintained&color=1d63ed&style=flat-square) [![Last commit on kiota.ch](https://badges.kiota.ch/gitea/last-commit/r8e/http-cache?gitea_url=https://kiota.ch&style=flat-square)](https://kiota.ch/r8e/http-cache)
 
-[![Build status on kiota.ch](https://kiota.ch/r8e/http-cache/badges/workflows/published.yaml/badge.svg)](https://kiota.ch/r8e/http-cache/actions)
+[![Publish pipeline on kiota.ch](https://kiota.ch/r8e/http-cache/badges/workflows/published.yaml/badge.svg?style=flat-square)](https://kiota.ch/r8e/http-cache/actions) [![Vulnerability audit on kiota.ch](https://kiota.ch/r8e/http-cache/badges/workflows/audited.yaml/badge.svg?style=flat-square)](https://kiota.ch/r8e/http-cache/actions) [![Dependency freshness on kiota.ch](https://kiota.ch/r8e/http-cache/badges/workflows/check-outdated.yaml/badge.svg?style=flat-square)](https://kiota.ch/r8e/http-cache/actions) [![Analysis sweep on kiota.ch](https://kiota.ch/r8e/http-cache/badges/workflows/analyze.yaml/badge.svg?style=flat-square)](https://kiota.ch/r8e/http-cache/actions)
 
 ## Можливості
 
 - Універсальний кешуючий HTTP-проксі
-- Persistent APT cache across builds
-- Service process management with log routing (b19-exec)
-- Cached artifact downloads with integrity verification (b19-fetch)
-- Timed command execution with failure reporting (b19-run)
-- Run-once initialization (bootstrap.d)
-- Modular build hooks (build.d)
-- Automatic CPU count detection (NUMPROCS)
-- Declarative dependency management (b19-deps)
-- Pluggable startup system (entrypoint.d)
-- Feature toggles for all subsystems
-- Built-in health monitoring (healthcheck.d)
-- Multilingual shell output (b19-i18n)
-- Image lineage tracking
-- Structured, level-filtered logging (b19-log)
-- Non-root container by default
-- Air-gapped / offline build and runtime support
-- Runtime overlay injection
-- Reproducible base image (pinned by digest)
-- Port validation
-- Unified lifecycle runner family
-- Docker secrets auto-loading (secrets)
-- Interactive shell hooks (shell.d)
-- Graceful signal handling
-- Jinja2 configuration templates (minijinja-cli)
-- Built-in test framework (test.d)
-- Pre-installed utility tools
-- XDG Base Directory paths
+
+### Успадковано від B19/Ubuntu 1.4.1
+
+- Постійний APT-кеш між збираннями
+- Керування службовими процесами зі спрямуванням журналів (b19-exec)
+- Кешовані завантаження артефактів із перевіркою цілісності (b19-fetch)
+- Вимірюване виконання команд зі звітуванням про збої (b19-run)
+- Одноразова ініціалізація (bootstrap.d)
+- Модульні хуки збирання (build.d)
+- Автоматичне визначення кількості CPU (NUMPROCS)
+- Декларативне керування залежностями (b19-deps)
+- Підключована система запуску (entrypoint.d)
+- Перемикачі функцій для всіх підсистем
+- Вбудований моніторинг стану (healthcheck.d)
+- Багатомовний вивід shell (b19-i18n)
+- Відстеження лініжу образу
+- Структуроване журналування з фільтром за рівнем (b19-log)
+- Контейнер без прав root за замовчуванням
+- Підтримка ізольованих від інтернету (air-gapped/offline) збирання й виконання
+- Ін’єкція оверлеїв під час виконання
+- Відтворюваний базовий образ (зафіксований за digest)
+- Перевірка портів
+- Уніфіковане сімейство ранерів життєвого циклу
+- Автозавантаження Docker-секретів (secrets)
+- Хуки інтерактивної shell (shell.d)
+- Плавна обробка сигналів
+- Шаблони конфігурації Jinja2 (minijinja-cli)
+- Вбудований тестовий фреймворк (test.d)
+- Попередньо встановлені службові інструменти
+- Шляхи XDG Base Directory
 
 Див. [FEATURES.md](FEATURES.md), щоб переглянути повний перелік.
 
@@ -60,12 +63,23 @@ pf-cli-managed: yes
 
 Завантажте опублікований образ контейнера:
 
+### Завантажити з GHCR
+
 ```sh
 docker pull ghcr.io/damian-buho/r8e/http-cache:latest
+```
+
+### Завантажити з DockerHub
+
+```sh
 docker pull docker.io/damianbuho/r8e-http-cache:latest
 ```
 
+Стабільні випуски також публікують теґи `X.Y.Z`, `X.Y` і `X` — завантажте той рівень точності, який хочете зафіксувати.
+
 Якщо наведені вище реєстри недоступні, завантажте з джерела:
+
+### Завантажити з Kiota
 
 ```sh
 docker pull kiota.ch/r8e/http-cache:latest
@@ -83,7 +97,9 @@ make dc-down
 
 ## Збирання
 
-- [Довідник із Makefile](../MAKEFILE.md)
+Виконайте `make` без аргументів для типової цілі; виконайте `make help`, щоб переглянути всі цілі.
+
+Для локального циклу розробки `make dev-container` піднімає dev-container.
 
 Точки входу конвеєра:
 
@@ -92,35 +108,20 @@ make dc-down
 - `make check-outdated` — Report every pinned dependency that lags upstream
 - `make ready-to-publish` — Run the pseudo-CI pipeline locally — build, test and scan, without publishing
 
-Виконайте `make` без аргументів для типової цілі; виконайте `make help`, щоб переглянути всі цілі.
-
-Для локального циклу розробки `make dev-container` піднімає dev-container.
-
 ## Політики
 
 - [Як зробити внесок](CONTRIBUTING.md)
 - [Політика безпеки](SECURITY.md)
 - [Як отримати підтримку](SUPPORT.md)
 - [Кодекс поведінки](CODE_OF_CONDUCT.md)
+- [Політика щодо ШІ та LLM](AI_POLICY.md)
 
 ## Посилання
 
-### Проєкт
-
 - [Специфікація Projectfile](https://projectfile.org)
-- [R8E / HTTP Cache (unofficial b19-style image) на Codeberg](https://codeberg.org/r8e/http-cache)
-- [R8E / HTTP Cache (unofficial b19-style image) на GitHub](https://github.com/damian-buho/r8e-http-cache)
-- [R8E / HTTP Cache (unofficial b19-style image) на kiota.ch](https://kiota.ch/r8e/http-cache)
-- [Issues на Codeberg](https://codeberg.org/r8e/http-cache/issues)
-- [Issues на GitHub](https://github.com/damian-buho/r8e-http-cache/issues)
-
-### Інше
-
-- [Від автора](https://dbuho.me)
 
 ## Ліцензія
 
 Цей проєкт ліцензовано на умовах MIT — див. файл [LICENSE](LICENSE) для подробиць.
 
-*Згенеровано з projectfile ([дізнатися як](https://projectfile.org/how-to/readme))*
 <!-- textlint-enable -->
