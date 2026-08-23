@@ -17,6 +17,7 @@ identity:
     uk: Дистрибуція Nginx з підтримкою спільноти, зібрана на основі B19/Ubuntu. Цей репозиторій містить лише пакування — Dockerfile, скрипти збирання та конфігурацію, усе під ліцензією MIT; вихідний код Nginx отримують під час збирання, і він зберігає власну ліцензію.
 includes:
   - .makefile/b19/ci.yaml
+  - .makefile/library/images/nginx.yaml
   - .projectfile/vulnerabilities.yaml
   - https://kiota.ch/damian-buho/metadata/raw/branch/main/include.yaml
   - https://kiota.ch/r8e/metadata/raw/branch/main/include.yaml

@@ -155,6 +155,7 @@ jobs:
       M6E_APT_CACHE_PORT: ${{ inputs.M6E_APT_CACHE_PORT || vars.M6E_APT_CACHE_PORT }}
       M6E_NEAR_CACHE_HOST: ${{ inputs.M6E_NEAR_CACHE_HOST || vars.M6E_NEAR_CACHE_HOST }}
       M6E_NEAR_CACHE_PORT: ${{ inputs.M6E_NEAR_CACHE_PORT || vars.M6E_NEAR_CACHE_PORT }}
+      O9S_NGINX_BASE_IMAGE: ${{ vars.O9S_NGINX_BASE_IMAGE || format('{0}/o9s/nginx:{1}', vars.SOURCE_DOCKER_REGISTRY || 'ghcr.io/damian-buho', vars.BASE_IMAGE_DEFAULT_VERSION || 'latest') }}
       SOURCE_DOCKER_REGISTRY: ${{ inputs.SOURCE_DOCKER_REGISTRY || vars.SOURCE_DOCKER_REGISTRY }}
     steps:
       - uses: actions/checkout@v7
@@ -178,6 +179,7 @@ jobs:
             M6E_NEAR_CACHE_HOST=${{ inputs.M6E_NEAR_CACHE_HOST || vars.M6E_NEAR_CACHE_HOST }}
             M6E_NEAR_CACHE_PORT=${{ inputs.M6E_NEAR_CACHE_PORT || vars.M6E_NEAR_CACHE_PORT }}
             M6E_PROJECT=http-cache
+            O9S_NGINX_BASE_IMAGE=${{ vars.O9S_NGINX_BASE_IMAGE || format('{0}/o9s/nginx:{1}', vars.SOURCE_DOCKER_REGISTRY || 'ghcr.io/damian-buho', env.M6E_TAG) }}
             SOURCE_DOCKER_REGISTRY=${{ inputs.SOURCE_DOCKER_REGISTRY || vars.SOURCE_DOCKER_REGISTRY }}
           mounts: fetch=/fetch
           pf-cli-image: ${{ vars.PF_CLI_IMAGE || format('{0}/projectfile/cli:{1}', vars.SOURCE_DOCKER_REGISTRY || 'ghcr.io/damian-buho', env.M6E_TAG) }}

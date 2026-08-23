@@ -2,11 +2,10 @@
 #
 # SPDX-License-Identifier: MIT
 
-ARG O9S_NGINX_VERSION=1
-ARG SOURCE_DOCKER_REGISTRY=registry.invalid
+ARG O9S_NGINX_BASE_IMAGE=registry.invalid/o9s/nginx:latest
 # .invalid zone used to force you to set the real registry
 
-FROM ${SOURCE_DOCKER_REGISTRY}/o9s/nginx:${O9S_NGINX_VERSION} AS r8e-http-cache
+FROM ${O9S_NGINX_BASE_IMAGE} AS r8e-http-cache
 
 ARG M6E_BUILD_DEBUG
 ARG M6E_VERSION
