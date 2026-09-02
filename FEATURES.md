@@ -11,20 +11,11 @@ SPDX-License-Identifier: MIT
 
 ### Generic HTTP caching proxy
 
-- Thin image on `o9s/nginx` (cross-namespace base); nginx runtime, modules, HTTP/3, precompression and env-config are inherited from the base — this image only adds the cache routing and tuning
-- Listens on nginx port `${O9S_NGINX_HTTP_PORT}` — default `80`
-- URL scheme `/{host}/{path}`: the first path segment is extracted as the upstream host, the remainder is proxied over HTTPS to `https://{host}{path}` (`.container/user/app/.config/includes/index/cache.nginx.j2`)
-- Missing first path segment → `400`; redirects (301/302/303/307/308) are followed internally via an `@redirect` location rather than passed to the client
-- Response headers added `always`: `X-Cache-Status` (`$upstream_cache_status`), `X-Upstream-Host`, `X-Upstream-Target`, `X-Upstream-Redirect`
-- Cache zone `proxy-cache`, cache key `$scheme$proxy_host$request_uri`; selected by `O9S_NGINX_INDEX_TYPE=cache`
-- Traefik enabled: router `r8e-http-cache` on `` Host(`http-cache.docker.localhost`) ``, entrypoints `web,websecure`, `redirect-to-https@file` middleware, loadbalancer port `${O9S_NGINX_HTTP_PORT}`
-- Cache tuning defaults set by this image (consumed by the inherited o9s/nginx env-config):
-    - `O9S_NGINX_PROXY_CACHE_VALID_200=90d`, `O9S_NGINX_PROXY_CACHE_VALID_301=90d`, `O9S_NGINX_PROXY_CACHE_VALID_ANY=1m`
-    - `O9S_NGINX_PROXY_CACHE_INACTIVE=90d`, `O9S_NGINX_PROXY_CACHE_KEYS_SIZE=8m`
-    - `O9S_NGINX_PROXY_CACHE_LOCK=on`, `O9S_NGINX_PROXY_CACHE_LOCK_TIMEOUT=300s`
-    - `O9S_NGINX_PROXY_CACHE_REVALIDATE=on`, `O9S_NGINX_PROXY_CACHE_USE_STALE=updating`, `O9S_NGINX_PROXY_CACHE_BACKGROUND_UPDATE=on`
-    - `O9S_NGINX_PROXY_BUFFERS_NUM=32`, `O9S_NGINX_PROXY_BUFFERS_SIZE=64k`, `O9S_NGINX_PROXY_BUFFER_SIZE=16k`, `O9S_NGINX_PROXY_MAX_TEMP_FILE_SIZE=1024m`
-    - `O9S_NGINX_PROXY_FORCE_RANGES=on`, `O9S_NGINX_PROXY_IGNORE_CLIENT_ABORT=on`, `O9S_NGINX_PROXY_INTERCEPT_ERRORS=on`, `O9S_NGINX_PROXY_SSL_SERVER_NAME=on`, `O9S_NGINX_RECURSIVE_ERROR_PAGES=on`
+- Caches any HTTP upstream: pass a URL path with the target host and the proxy fetches, caches, and serves the response.
+- Redirects are followed internally, so clients always receive the final content rather than being bounced between origins.
+- Cache status is visible in response headers (X-Cache-Status, X-Upstream-Host, X-Upstream-Target), making hit/miss diagnosis straightforward.
+- Sensible defaults for cache validity, locking, revalidation, and stale serving mean the proxy is production-ready out of the box.
+- Traefik-integrated routing makes the cache discoverable through the standard ingress layer.
 
 ## Inherited from B19/Ubuntu
 
@@ -98,11 +89,12 @@ SPDX-License-Identifier: MIT
 
 ### Built-in health monitoring (healthcheck.d)
 
-- Docker-native healthcheck declared in the base image and inherited by all downstream images with no extra configuration.
-- Eight default checks ship in the base image: disk space, filesystem writability and a TCP listen probe run everywhere; HTTPS connectivity, DNS resolution and TCP reachability run only where `B19_HEALTH_EGRESS=true`, so a container that never reaches the internet carries no check a third party can fail.
-- Egress checks are fault-tolerant — success on any target counts as pass.
-- All egress checks automatically skip in offgrid mode; all checks can be disabled at runtime.
-- Downstream images add service-specific checks (HTTP endpoints, database connections, process liveness) by dropping scripts into a directory.
+- Docker-native healthcheck inherited by every downstream image with no extra configuration.
+- Egress checks are opt-in: a container that never reaches the internet carries no check a third party can fail, while one whose job is the internet reports unhealthy the moment the outside is gone.
+- Works the same offline as online — egress checks stand down automatically under offgrid mode.
+- Adding a check is dropping a script in a directory, not writing Docker plumbing.
+
+See [use-healthcheck.d](../how-to/use-healthcheck.d.md) for the check list, slot numbering, and configuration.
 
 ### Multilingual shell output (b19-i18n)
 
@@ -188,6 +180,7 @@ SPDX-License-Identifier: MIT
 - Jinja2-compatible template rendering at both build time and container startup.
 - Drop a `.j2` file anywhere in the app directory; it is discovered at build time and rendered at every startup with all environment variables available.
 - Runtime rendering is parallel and automatic — downstream images get it with zero configuration.
+- Skip specific templates at runtime with `B19_J2_SKIP_FILES` (comma-separated basenames).
 - Immutable mode (`B19_IMMUTABLE=Y`) locks the filesystem to build-time state, skipping all runtime rendering.
 
 ### Built-in test framework (test.d)
