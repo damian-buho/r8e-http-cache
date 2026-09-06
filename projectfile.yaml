@@ -21,6 +21,13 @@ includes:
   - .projectfile/vulnerabilities.yaml
   - https://kiota.ch/damian-buho/metadata/raw/branch/main/include.yaml
   - https://kiota.ch/r8e/metadata/raw/branch/main/include.yaml
+keywords:
+  - nginx
+  - http-cache
+  - proxy
+  - cache
+  - reverse-proxy
+  - docker
 kind: SoftwareSourceCode
 links:
   - label:
@@ -84,12 +91,5 @@ repositories:
   - role: origin
     type: git
     url: ssh://git@kiota.ch/r8e/http-cache.git
-keywords:
-  - nginx
-  - http-cache
-  - proxy
-  - cache
-  - reverse-proxy
-  - docker
 technologies:
   - c
