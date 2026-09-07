@@ -44,6 +44,8 @@ name: published
         type: string
       SOURCE_DOCKER_REGISTRY:
         type: string
+permissions:
+  contents: read
 env:
   M6E_TAG: ${{ vars.BASE_IMAGE_DEFAULT_VERSION || 'latest' }}
   M6E_RUN_SCOPE: ${{ github.run_id }}-${{ github.run_attempt }}
@@ -74,6 +76,7 @@ jobs:
       - uses: actions/checkout@v7
         with:
           submodules: true
+          persist-credentials: false
       - uses: actions/download-artifact@v3
         with:
           name: image-${{ github.run_id }}
@@ -124,6 +127,7 @@ jobs:
       - uses: actions/checkout@v7
         with:
           submodules: true
+          persist-credentials: false
       - name: auto-markdownlint
         uses: projectfile/actions/run-tool@v1
         with:
@@ -167,6 +171,7 @@ jobs:
       - uses: actions/checkout@v7
         with:
           submodules: true
+          persist-credentials: false
       - name: container-build
         uses: projectfile/actions/container-build/buildah@v1
         with:
@@ -205,6 +210,7 @@ jobs:
       - uses: actions/checkout@v7
         with:
           submodules: true
+          persist-credentials: false
       - uses: actions/download-artifact@v3
         with:
           name: image-${{ github.run_id }}
@@ -250,6 +256,7 @@ jobs:
       - uses: actions/checkout@v7
         with:
           submodules: true
+          persist-credentials: false
       - name: pf-bridge-check
         uses: projectfile/actions/run-tool@v1
         with:
@@ -262,6 +269,7 @@ jobs:
       - uses: actions/checkout@v7
         with:
           submodules: true
+          persist-credentials: false
       - name: pf-validate
         uses: projectfile/actions/run-tool@v1
         with:
@@ -287,6 +295,7 @@ jobs:
       - uses: actions/checkout@v7
         with:
           submodules: true
+          persist-credentials: false
       - uses: actions/download-artifact@v3
         with:
           name: image-${{ github.run_id }}
@@ -339,6 +348,7 @@ jobs:
       - uses: actions/checkout@v7
         with:
           submodules: true
+          persist-credentials: false
       - name: i18n-check
         uses: projectfile/actions/run-tool@v1
         with:
@@ -362,6 +372,7 @@ jobs:
       - uses: actions/checkout@v7
         with:
           submodules: true
+          persist-credentials: false
       - name: grype-scan-source
         uses: projectfile/actions/run-tool@v1
         with:
@@ -394,6 +405,7 @@ jobs:
       - uses: actions/checkout@v7
         with:
           submodules: true
+          persist-credentials: false
       - name: auto-cffr-validate
         uses: projectfile/actions/run-tool@v1
         with:
