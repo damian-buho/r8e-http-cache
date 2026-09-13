@@ -32,3 +32,4 @@ keywords:
   - cache
   - reverse-proxy
   - docker
+version: 1.2.0
