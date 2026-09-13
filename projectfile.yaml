@@ -15,6 +15,7 @@ identity:
     en: Community-maintained distribution of Nginx built on B19/Ubuntu. This repository holds only the packaging — Dockerfile, build scripts, and configuration, all MIT-licensed; the upstream Nginx is fetched at build time and retains its own licensing.
     es: Distribución de Nginx mantenida por la comunidad, construida sobre B19/Ubuntu. Este repositorio contiene únicamente el empaquetado — Dockerfile, scripts de compilación y configuración, todo con licencia MIT; el código original de Nginx se obtiene en tiempo de compilación y conserva su propia licencia.
     uk: Дистрибуція Nginx з підтримкою спільноти, зібрана на основі B19/Ubuntu. Цей репозиторій містить лише пакування — Dockerfile, скрипти збирання та конфігурацію, усе під ліцензією MIT; вихідний код Nginx отримують під час збирання, і він зберігає власну ліцензію.
+  version: 1.2.0
 includes:
   - .makefile/b19/ci.yaml
   - .makefile/library/images/nginx.yaml
@@ -88,7 +89,8 @@ repositories:
   - role: mirror
     type: git
     url: git@github.com:damian-buho/r8e-http-cache.git
-  - role: origin
+  - branch: main
+    role: origin
     type: git
     url: ssh://git@kiota.ch/r8e/http-cache.git
 technologies:
