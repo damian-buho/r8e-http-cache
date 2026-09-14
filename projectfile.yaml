@@ -30,50 +30,6 @@ keywords:
   - reverse-proxy
   - docker
 kind: SoftwareSourceCode
-links:
-  - label:
-      en: R8E / HTTP Cache on Codeberg
-      es: R8E / HTTP Cache en Codeberg
-      uk: R8E / HTTP Cache на Codeberg
-    tags:
-      - public
-      - badges
-      - badges-gitea
-    type: source-code
-    url: https://codeberg.org/r8e/http-cache
-  - label:
-      en: R8E / HTTP Cache on GitHub
-      es: R8E / HTTP Cache en GitHub
-      uk: R8E / HTTP Cache на GitHub
-    tags:
-      - public
-      - badges
-      - badges-github
-    type: source-code
-    url: https://github.com/damian-buho/r8e-http-cache
-  - label:
-      en: R8E / HTTP Cache on kiota.ch
-      es: R8E / HTTP Cache en kiota.ch
-      uk: R8E / HTTP Cache на kiota.ch
-    preferred: true
-    type: source-code
-    url: https://kiota.ch/r8e/http-cache
-  - label:
-      en: Issues on Codeberg
-      es: Incidencias en Codeberg
-      uk: Issues на Codeberg
-    tags:
-      - support
-    type: bugs
-    url: https://codeberg.org/r8e/http-cache/issues
-  - label:
-      en: Issues on GitHub
-      es: Incidencias en GitHub
-      uk: Issues на GitHub
-    tags:
-      - support
-    type: bugs
-    url: https://github.com/damian-buho/r8e-http-cache/issues
 org:
   projectfile:
     conventions:
@@ -81,17 +37,18 @@ org:
         parents:
           - url: ssh://git@kiota.ch/b19/ubuntu.git
     status: maintained
+technologies:
+  - c
 repositories:
-  - issues: true
-    role: mirror
-    type: git
-    url: ssh://git@codeberg.org/r8e/http-cache.git
-  - role: mirror
-    type: git
-    url: git@github.com:damian-buho/r8e-http-cache.git
   - branch: main
     role: origin
     type: git
     url: ssh://git@kiota.ch/r8e/http-cache.git
-technologies:
-  - c
+links:
+  - label:
+      en: R8E / HTTP Cache on kiota.ch
+      es: R8E / HTTP Cache en kiota.ch
+      uk: R8E / HTTP Cache на kiota.ch
+    preferred: true
+    type: source-code
+    url: https://kiota.ch/r8e/http-cache
