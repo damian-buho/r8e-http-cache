@@ -11,13 +11,6 @@ pf-cli-managed: yes
 Thanks for using **R8E / HTTP Cache**!
 This document explains where to get help and how to ask effective questions.
 
-## Before You Ask
-
-Please check these first — your question may already be answered:
-
-- [Issues on Codeberg](https://codeberg.org/r8e/http-cache/issues)
-- [Issues on GitHub](https://github.com/damian-buho/r8e-http-cache/issues)
-
 ## Where to Ask
 
 - **Report a security vulnerability** — [SECURITY.md](SECURITY.md)

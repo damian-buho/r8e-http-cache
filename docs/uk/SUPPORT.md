@@ -12,13 +12,6 @@ pf-cli-managed: yes
 Дякуємо, що користуєтеся **R8E / HTTP Cache**!
 Цей документ пояснює, де шукати допомогу та як ставити зрозумілі запитання.
 
-## Перш ніж питати
-
-Перегляньте це спершу — можливо, відповідь уже є:
-
-- [Issues на Codeberg](https://codeberg.org/r8e/http-cache/issues)
-- [Issues на GitHub](https://github.com/damian-buho/r8e-http-cache/issues)
-
 ## Куди звертатися
 
 - **Повідомити про вразливість безпеки** — [SECURITY.md](SECURITY.md)
