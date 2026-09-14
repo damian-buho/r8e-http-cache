@@ -30,20 +30,6 @@ keywords:
   - reverse-proxy
   - docker
 kind: SoftwareSourceCode
-org:
-  projectfile:
-    conventions:
-      fragments:
-        parents:
-          - url: ssh://git@kiota.ch/b19/ubuntu.git
-    status: maintained
-technologies:
-  - c
-repositories:
-  - branch: main
-    role: origin
-    type: git
-    url: ssh://git@kiota.ch/r8e/http-cache.git
 links:
   - label:
       en: R8E / HTTP Cache on kiota.ch
@@ -52,3 +38,17 @@ links:
     preferred: true
     type: source-code
     url: https://kiota.ch/r8e/http-cache
+org:
+  projectfile:
+    conventions:
+      fragments:
+        parents:
+          - url: ssh://git@kiota.ch/b19/ubuntu.git
+    status: maintained
+repositories:
+  - branch: main
+    role: origin
+    type: git
+    url: ssh://git@kiota.ch/r8e/http-cache.git
+technologies:
+  - c
