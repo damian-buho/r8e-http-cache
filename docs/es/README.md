@@ -54,6 +54,11 @@ Distribución de Nginx mantenida por la comunidad, basada en B19/Ubuntu
 
 Consulta [FEATURES.md](FEATURES.md) para ver la lista completa.
 
+## Plataformas admitidas
+
+- `linux/amd64`
+- `linux/arm64`
+
 ## Instalación
 
 Si los registros anteriores no están disponibles, descarga desde el origen:
