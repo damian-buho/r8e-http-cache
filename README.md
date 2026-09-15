@@ -18,7 +18,10 @@ Community-maintained distribution of Nginx based on B19/Ubuntu
 
 ## Features
 
+- Built for large CI artifacts
 - Generic HTTP caching proxy
+- Serves through upstream outages
+- Safe shared caching
 
 ### Inherited from B19/Ubuntu
 

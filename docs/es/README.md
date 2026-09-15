@@ -20,7 +20,10 @@ Distribución de Nginx mantenida por la comunidad, basada en B19/Ubuntu
 
 ## Características
 
+- Pensada para artefactos grandes de CI
 - Proxy de caché HTTP genérico
+- Sirve aunque los orígenes caigan
+- Caché compartida y segura
 
 ### Heredado de B19/Ubuntu
 
