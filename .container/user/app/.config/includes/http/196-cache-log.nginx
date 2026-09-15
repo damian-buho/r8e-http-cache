@@ -1,0 +1,8 @@
+# SPDX-FileCopyrightText: 2026 Damián Búho <damian.buho@proton.me>
+#
+# SPDX-License-Identifier: MIT
+
+log_format cache  '$time_local $status\t'
+                  '$request $body_bytes_sent'
+                  '$remote_addr $http_user_agent $http_referer'
+                  'cache=$upstream_cache_status host=$upstream_host target=$target';

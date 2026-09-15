@@ -54,6 +54,12 @@ No secrets required. No Traefik labels.
 - Bounds: `max_size=20G` evicts LRU via the cache manager instead of filling the host disk; tune via `O9S_NGINX_PROXY_CACHE_MAX_SIZE`. Sizing math: ~8k keys per 1m of `keys_zone`, so 256m holds ~2M entries, and 2M npm/Go/PyPI artifacts at ~10KB average need ~20G. Raise zone and max_size together when entry counts outgrow that.
 - `B19_HEALTH_EGRESS=false`: egress/DNS healthchecks stay off so an outside outage reads as healthy. The cache keeps serving stale (see contract above) instead of flapping unhealthy and restarting into a cold index.
 
+## Observability
+
+- Status endpoint `GET /status/nginx` (via `enable-status`) answers on localhost only (`allow 127.0.0.1; deny all`) and is also what the image healthcheck curls.
+- Access log uses the `cache` format: the default fields plus `cache=$upstream_cache_status host=$upstream_host target=$target`. Hit ratio is `grep -o 'cache=[A-Z]*' access.log | sort | uniq -c` with values MISS/HIT/EXPIRED/STALE/UPDATING/BYPASS.
+- `X-Cache-Status` / `X-Upstream-Host` / `X-Upstream-Target` are diagnostic-only. They are emitted from config at serve time, never stored in cache entries: on a HIT the location still runs and the headers describe the current request, so a HIT can never carry a previous MISS's values.
+
 ## Documentation
 
 - [Project objectives](@docs/goal.md)
