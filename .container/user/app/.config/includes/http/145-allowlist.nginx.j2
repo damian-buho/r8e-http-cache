@@ -1,0 +1,22 @@
+{#
+SPDX-FileCopyrightText: 2026 Damián Búho <damian.buho@proton.me>
+
+SPDX-License-Identifier: MIT
+#}
+
+# Upstream allowlist for the cache index. Default deny: empty regex emits no rule.
+map $upstream_host $upstream_allowed {
+    default 0;
+{% if ENV.R8E_HTTP_CACHE_ALLOWLIST_REGEX is defined and ENV.R8E_HTTP_CACHE_ALLOWLIST_REGEX != "" %}
+    "~*{{ ENV.R8E_HTTP_CACHE_ALLOWLIST_REGEX }}" 1;
+{% endif %}
+}
+
+# Literal SSRF block as defense in depth behind the allowlist above.
+map $upstream_host $upstream_blocked {
+    default 0;
+    "~*(^|\.)localhost$" 1;
+    "~*^metadata\.google\.internal$" 1;
+    "~^(127\.|10\.|172\.(1[6-9]|2[0-9]|3[0-1])\.|192\.168\.|169\.254\.|0\.)" 1;
+    "~*^(::|\[|(fc|fd)[0-9a-f]*:|fe80:)" 1;
+}

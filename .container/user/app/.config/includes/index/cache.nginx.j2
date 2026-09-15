@@ -11,6 +11,10 @@ SPDX-License-Identifier: MIT
 
     # ------------------------------------------------------------------
     location / {
+        # Only cacheable methods are ever relayed upstream
+        limit_except GET HEAD {
+            deny all;
+        }
         # Extract first path component as upstream domain
         set $upstream_host "";
         set $upstream_path "";
@@ -23,6 +27,26 @@ SPDX-License-Identifier: MIT
 
         if ($upstream_host = "") {
             return 400;
+        }
+
+        # Reject userinfo smuggling via @ in the host segment
+        if ($upstream_host ~ "@") {
+            return 400;
+        }
+
+        # Reject trailing-dot FQDN tricks that dodge exact-match allowlists
+        if ($upstream_host ~ "\.$") {
+            return 400;
+        }
+
+        # Literal interior targets never leave this box
+        if ($upstream_blocked = 1) {
+            return 403;
+        }
+
+        # Allowlist is default deny; widen it only via documented ENV override
+        if ($upstream_allowed = 0) {
+            return 403;
         }
 
         add_header X-Cache-Status $upstream_cache_status always;
@@ -44,6 +68,10 @@ SPDX-License-Identifier: MIT
     # ------------------------------------------------------------------
     location @redirect {
         internal;
+
+        limit_except GET HEAD {
+            deny all;
+        }
 
         set $new $upstream_http_location;
         if ($new = "") { return 502; }

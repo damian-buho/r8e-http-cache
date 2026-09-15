@@ -40,6 +40,9 @@ ENV O9S_NGINX_INDEX_TYPE=cache                      \
     O9S_NGINX_PROXY_SSL_SERVER_NAME=on              \
     O9S_NGINX_RECURSIVE_ERROR_PAGES=on
 
+# Empty allowlist regex means default deny; widen only for local dev.
+ENV R8E_HTTP_CACHE_ALLOWLIST_REGEX=
+
 USER 0
 
 WORKDIR ${B19_HOME}
