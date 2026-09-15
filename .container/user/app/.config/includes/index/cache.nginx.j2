@@ -5,7 +5,7 @@ SPDX-License-Identifier: MIT
 #}
 
     proxy_cache proxy-cache;
-    proxy_cache_key "$scheme$proxy_host$request_uri";
+    proxy_cache_key "$scheme$upstream_host$request_uri";
 
     add_header X-Cache-Status $upstream_cache_status always;
 
@@ -33,7 +33,9 @@ SPDX-License-Identifier: MIT
         add_header X-Upstream-Target $target always;
 
         proxy_pass $target;
-        proxy_set_header Host $proxy_host;
+        proxy_set_header Host $upstream_host;
+        proxy_ssl_name $upstream_host;
+        proxy_ssl_server_name on;
 
         # Redirects get handled internally instead of passed to clients
         error_page 301 302 303 307 308 = @redirect;
@@ -47,7 +49,9 @@ SPDX-License-Identifier: MIT
         if ($new = "") { return 502; }
 
         proxy_pass $new;
-        proxy_set_header Host $proxy_host;
+        proxy_set_header Host $upstream_host;
+        proxy_ssl_name $upstream_host;
+        proxy_ssl_server_name on;
         add_header X-Cache-Status $upstream_cache_status always;
         add_header X-Upstream-Redirect $new always;
     }
