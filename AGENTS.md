@@ -41,7 +41,7 @@ No secrets required.
 
 - Only `GET`/`HEAD` are relayed (`limit_except` in both cache locations); only those methods are cached.
 - `map $check_host $upstream_allowed` (`includes/http/145-allowlist.nginx.j2`) is default deny, matched against the bare host without any port suffix. Widen via `R8E_HTTP_CACHE_ALLOWLIST_REGEX` (unanchored `~*` pattern, e.g. `^(registry\.example\.com|.*\.example\.org)$`). Local dev override: `R8E_HTTP_CACHE_ALLOWLIST_REGEX='.*'`.
-- `map $check_host $upstream_blocked` in the same file rejects literal loopback, private, link-local, and cloud-metadata targets even when the allowlist is widened. A regex alone cannot stop DNS rebinding, so the allowlist stays the real gate: `proxy_pass` uses a variable, hence resolution happens per request through `O9S_NGINX_RESOLVER` (default Docker `127.0.0.11`, `ipv6=off`), and operators must keep interior names out of that resolver view and firewall egress accordingly.
+- `map $check_host $upstream_blocked` in the same file rejects literal loopback, private, link-local, and cloud-metadata targets even when the allowlist is widened. A regular expression alone cannot stop DNS rebinding, so the allowlist stays the real gate: `proxy_pass` uses a variable, hence resolution happens per request through `O9S_NGINX_RESOLVER` (default Docker `127.0.0.11`, `ipv6=off`), and operators must keep interior names out of that resolver view and firewall egress accordingly.
 - Host shape is validated before `proxy_pass`: empty, userinfo (`@`), and trailing-dot hosts get 400; blocked/denied hosts get 403.
 
 ## Stale-serving contract
@@ -59,7 +59,7 @@ No secrets required.
 
 - Status endpoint `GET /status/nginx` (via `enable-status`) answers on localhost only (`allow 127.0.0.1; deny all`) and is also what the image healthcheck curls.
 - Access log uses the `cache` format: the default fields plus `cache=$upstream_cache_status host=$upstream_host target=$target`. Hit ratio is `grep -o 'cache=[A-Z]*' access.log | sort | uniq -c` with values MISS/HIT/EXPIRED/STALE/UPDATING/BYPASS.
-- `X-Cache-Status` / `X-Upstream-Host` / `X-Upstream-Target` are diagnostic-only. They are emitted from config at serve time, never stored in cache entries: on a HIT the location still runs and the headers describe the current request, so a HIT can never carry a previous MISS's values.
+- `X-Cache-Status` / `X-Upstream-Host` / `X-Upstream-Target` are diagnostic-only. They are emitted from config at serve time, never stored in cache entries: on a HIT the location still runs and the headers describe the current request, so a HIT can never carry a previous MISS’s values.
 
 ## Invalidation, bypass, warm-up
 

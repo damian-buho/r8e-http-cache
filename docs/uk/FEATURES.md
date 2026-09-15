@@ -11,22 +11,32 @@ SPDX-License-Identifier: MIT
 
 ## Можливості проєкту
 
+### Створено для великих CI-артефактів
+
+- Паралельні завантаження діапазонами одного файла ділять записи кешу, замість того щоб кожне наповнювало власний.
+- Трекингові параметри ніколи не розгалужують записи кешу, а підписані URL й надалі кешуються окремо.
+- Частку влучань видно з коробки: статус-ендпоінт і кеш-свідомі логи.
+
 ### Універсальний кешуючий HTTP-проксі
 
-- Тонкий образ на `o9s/nginx` (міжпросторова база); nginx-рантайм, модулі, HTTP/3, передстиснення й конфігурація з середовища успадковані від бази — цей образ лише додає маршрутизацію кешу й тюнінг
-- Слухає на порту nginx `${O9S_NGINX_HTTP_PORT}` — типово `80`
-- Схема URL `/{host}/{path}`: перший сегмент шляху витягується як upstream-хост, решта проксується по HTTPS до `https://{host}{path}` (`.container/user/app/.config/includes/index/cache.nginx.j2`)
-- Немає першого сегмента → `400`; редиректи (301/302/303/307/308) відслідковуються внутрішньо через location `@redirect`, а не віддаються клієнту
-- Заголовки відповіді, що додаються `always`: `X-Cache-Status` (`$upstream_cache_status`), `X-Upstream-Host`, `X-Upstream-Target`, `X-Upstream-Redirect`
-- Зона кешу `proxy-cache`, ключ кешу `$scheme$proxy_host$request_uri`; вибирається змінною `O9S_NGINX_INDEX_TYPE=cache`
-- Traefik увімкнено: роутер `r8e-http-cache` на `` Host(`http-cache.docker.localhost`) ``, entrypoints `web,websecure`, middleware `redirect-to-https@file`, порт балансувальника `${O9S_NGINX_HTTP_PORT}`
-- Типові значення тюнінгу кешу, задані цим образом (споживаються успадкованою конфігурацією o9s/nginx):
-    - `O9S_NGINX_PROXY_CACHE_VALID_200=90d`, `O9S_NGINX_PROXY_CACHE_VALID_301=90d`, `O9S_NGINX_PROXY_CACHE_VALID_ANY=1m`
-    - `O9S_NGINX_PROXY_CACHE_INACTIVE=90d`, `O9S_NGINX_PROXY_CACHE_KEYS_SIZE=8m`
-    - `O9S_NGINX_PROXY_CACHE_LOCK=on`, `O9S_NGINX_PROXY_CACHE_LOCK_TIMEOUT=300s`
-    - `O9S_NGINX_PROXY_CACHE_REVALIDATE=on`, `O9S_NGINX_PROXY_CACHE_USE_STALE=updating`, `O9S_NGINX_PROXY_CACHE_BACKGROUND_UPDATE=on`
-    - `O9S_NGINX_PROXY_BUFFERS_NUM=32`, `O9S_NGINX_PROXY_BUFFERS_SIZE=64k`, `O9S_NGINX_PROXY_BUFFER_SIZE=16k`, `O9S_NGINX_PROXY_MAX_TEMP_FILE_SIZE=1024m`
-    - `O9S_NGINX_PROXY_FORCE_RANGES=on`, `O9S_NGINX_PROXY_IGNORE_CLIENT_ABORT=on`, `O9S_NGINX_PROXY_INTERCEPT_ERRORS=on`, `O9S_NGINX_PROXY_SSL_SERVER_NAME=on`, `O9S_NGINX_RECURSIVE_ERROR_PAGES=on`
+- Кешує будь-який HTTPS-апстрим: передай шлях URL з цільовим хостом, і проксі отримає, закешує та віддасть відповідь.
+- Редиректи опрацьовуються внутрішньо, тож клієнти завжди отримують фінальний вміст, а не стрибають між ориджинами.
+- Стан кешу видно в заголовках відповіді (X-Cache-Status, X-Upstream-Host, X-Upstream-Target) — діагностика влучань і промахів проста.
+- Довгоживучі записи з блокуванням і фоновою ревалідацією захищають ориджини від лавин запитів.
+- Інтеграція з Traefik: кеш доступний через стандартний ingress-шар.
+
+### Працює, коли ориджини лежать
+
+- Прострочені записи віддаються як застарілий вміст, доки ориджин недоступний, замість помилки кожному клієнту.
+- Кеш переживає перезапуски на виділеному томі, тож перезапуск ніколи не означає холодний старт.
+- Використання диска обмежене з LRU-витісненням, а індекс у пам'яті розрахований на масштаби реєстрів пакунків.
+- Стан контейнера лишається зеленим під час зовнішніх аварій за задумом: кеш продовжує віддавати застаріле, а не перезапускається з порожнім індексом.
+
+### Безпечний спільний кеш
+
+- Allowlist із забороною за замовчуванням: через проксі можна отримати лише налаштовані апстрими.
+- Ретранслюються лише кешовані методи, а внутрішні чи метадані-адреси ніколи недосяжні.
+- Ворожі форми хоста (трюки з userinfo, кінцеві крапки, хибні порти) відхиляються ще до контакту з ориджином.
 
 ## Успадковано від B19/Ubuntu
 

@@ -9,13 +9,32 @@ SPDX-License-Identifier: MIT
 
 ## Project Features
 
+### Built for large CI artifacts
+
+- Concurrent range downloads of one file share cache entries instead of each filling its own.
+- Tracking parameters never fork cache entries, while signed URLs still cache apart.
+- Hit ratio is measurable out of the box through the status endpoint and cache-aware logs.
+
 ### Generic HTTP caching proxy
 
-- Caches any HTTP upstream: pass a URL path with the target host and the proxy fetches, caches, and serves the response.
+- Caches any HTTPS upstream: pass a URL path with the target host and the proxy fetches, caches, and serves the response.
 - Redirects are followed internally, so clients always receive the final content rather than being bounced between origins.
 - Cache status is visible in response headers (X-Cache-Status, X-Upstream-Host, X-Upstream-Target), making hit/miss diagnosis straightforward.
-- Sensible defaults for cache validity, locking, revalidation, and stale serving mean the proxy is production-ready out of the box.
+- Long-lived entries with locking and background revalidation shield origins from thundering herds.
 - Traefik-integrated routing makes the cache discoverable through the standard ingress layer.
+
+### Serves through upstream outages
+
+- Expired entries keep serving as stale while an origin is down, instead of failing every client.
+- The cache persists across restarts on a dedicated volume, so a restart never means starting cold.
+- Disk use is bounded with LRU eviction, and the in-memory index is sized for registry-scale fan-out.
+- Health stays green during outside outages by design: the cache keeps serving stale instead of restarting into an empty index.
+
+### Safe shared caching
+
+- Default-deny allowlist: only configured upstreams can be fetched through the proxy.
+- Only cacheable methods are relayed, and interior or metadata targets are never reachable.
+- Hostile host shapes (userinfo tricks, trailing dots, bad ports) are refused before any upstream contact.
 
 ## Inherited from B19/Ubuntu
 

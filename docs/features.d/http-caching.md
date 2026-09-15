@@ -6,8 +6,8 @@ SPDX-License-Identifier: MIT
 
 # Generic HTTP caching proxy
 
-- Caches any HTTP upstream: pass a URL path with the target host and the proxy fetches, caches, and serves the response.
+- Caches any HTTPS upstream: pass a URL path with the target host and the proxy fetches, caches, and serves the response.
 - Redirects are followed internally, so clients always receive the final content rather than being bounced between origins.
 - Cache status is visible in response headers (X-Cache-Status, X-Upstream-Host, X-Upstream-Target), making hit/miss diagnosis straightforward.
-- Sensible defaults for cache validity, locking, revalidation, and stale serving mean the proxy is production-ready out of the box.
+- Long-lived entries with locking and background revalidation shield origins from thundering herds.
 - Traefik-integrated routing makes the cache discoverable through the standard ingress layer.
