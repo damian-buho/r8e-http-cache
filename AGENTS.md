@@ -40,6 +40,12 @@ No secrets required. No Traefik labels.
 - Warm entry plus dead upstream serves the stale body with `X-Cache-Status: STALE` (`proxy_cache_use_stale` covers `updating error timeout http_500 http_502 http_503 http_504`; `background_update on` revalidates in the background while `lock on` serializes thundering herds).
 - Cold miss plus dead upstream has nothing to serve, so the upstream error (502/504) reaches the client. That is expected, not a bug.
 
+## Persistent bounded cache
+
+- Cache disk (`/app/cache`, 90d entries) lives on named volume `r8e-http-cache-data` (dev and pipeline); restarts keep entries, only `down -v` wipes them. The image seeds the dir owned by the runtime user so volume copy-up preserves ownership.
+- Bounds: `max_size=20G` evicts LRU via the cache manager instead of filling the host disk; tune via `O9S_NGINX_PROXY_CACHE_MAX_SIZE`. Sizing math: ~8k keys per 1m of `keys_zone`, so 256m holds ~2M entries, and 2M npm/Go/PyPI artifacts at ~10KB average need ~20G. Raise zone and max_size together when entry counts outgrow that.
+- `B19_HEALTH_EGRESS=false`: egress/DNS healthchecks stay off so an outside outage reads as healthy. The cache keeps serving stale (see contract above) instead of flapping unhealthy and restarting into a cold index.
+
 ## Documentation
 
 - [Project objectives](@docs/goal.md)

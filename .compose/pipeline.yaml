@@ -19,6 +19,11 @@ services:
     environment:
       - LANG
       - TZ
+    volumes:
+      - r8e-http-cache-data:/app/cache
 networks:
   dev-network:
     name: ${M6E_COMPOSE_PROJECT_NAME}-network
+volumes:
+  r8e-http-cache-data:
+    name: r8e-http-cache-data

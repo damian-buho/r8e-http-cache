@@ -25,9 +25,10 @@ ENV O9S_NGINX_INDEX_TYPE=cache                      \
     O9S_NGINX_PROXY_BUFFER_SIZE=16k                 \
     O9S_NGINX_PROXY_CACHE_BACKGROUND_UPDATE=on      \
     O9S_NGINX_PROXY_CACHE_INACTIVE=90d              \
-    O9S_NGINX_PROXY_CACHE_KEYS_SIZE=8m              \
+    O9S_NGINX_PROXY_CACHE_KEYS_SIZE=256m            \
     O9S_NGINX_PROXY_CACHE_LOCK=on                   \
     O9S_NGINX_PROXY_CACHE_LOCK_TIMEOUT=300s         \
+    O9S_NGINX_PROXY_CACHE_MAX_SIZE=" max_size=20G"  \
     O9S_NGINX_PROXY_CACHE_REVALIDATE=on             \
     O9S_NGINX_PROXY_CACHE_USE_STALE="updating error timeout http_500 http_502 http_503 http_504" \
     O9S_NGINX_PROXY_CACHE_VALID_200=90d             \
@@ -54,7 +55,9 @@ RUN --mount=type=bind,from=fetch,source=.,target=/fetch                         
     --mount=type=cache,id=apt-cache-${B19_UBUNTU_SERIES}-${TARGETARCH},target=/var/cache/apt,sharing=shared     \
     --mount=type=cache,id=apt-lists-${B19_UBUNTU_SERIES}-${TARGETARCH},target=/var/lib/apt,sharing=shared       \
     --mount=type=tmpfs,target=${B19_TEMP_PATH}                                                    \
-    build-stage root
+    build-stage root                                                                              \
+    && mkdir -p "${O9S_NGINX_CACHE_PATH}/proxy"                                                   \
+    && chown "${B19_UID}:${B19_GID}" "${O9S_NGINX_CACHE_PATH}" "${O9S_NGINX_CACHE_PATH}/proxy"
 
 # hadolint ignore=DL3066 # B19_UID comes from the root
 USER ${B19_UID}
@@ -66,8 +69,8 @@ RUN --mount=type=bind,from=fetch,source=.,target=/fetch                         
     --mount=type=tmpfs,target=${B19_TEMP_PATH}                                                      \
     build-stage user
 
-# This image cannot do its job offline, so a lost outside must read as unhealthy.
-ENV B19_HEALTH_EGRESS=true
+# This image serves stale from cache during an outage, so lost outside reads as healthy.
+ENV B19_HEALTH_EGRESS=false
 
 # ENTRYPOINT ["entrypoint.d"] is inherited
 # HEALTHCHECK CMD ["healthcheck.d"] is inherited

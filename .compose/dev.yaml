@@ -24,6 +24,7 @@ services:
       - TZ
       - B19_VERBOSITY=debug
     volumes:
+      - r8e-http-cache-data:/app/cache
       - /etc/localtime:/etc/localtime:ro
     tmpfs:
       - /tmp:size=64m
@@ -34,3 +35,6 @@ networks:
   traefik-network:
     name: traefik-network
     external: true
+volumes:
+  r8e-http-cache-data:
+    name: r8e-http-cache-data
