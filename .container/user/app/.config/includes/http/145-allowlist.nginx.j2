@@ -21,3 +21,10 @@ map $check_host $upstream_blocked {
     "~^(127\.|10\.|172\.(1[6-9]|2[0-9]|3[0-1])\.|192\.168\.|169\.254\.|0\.)" 1;
     "~*^(::|\[|(fc|fd)[0-9a-f]*:|fe80:)" 1;
 }
+
+# Query normalizer for the cache key: all-junk queries collapse to empty.
+map $args $cache_qs {
+    default "?$args";
+    "" "";
+    "~^(utm_[^&]*|fbclid=[^&]*|gclid=[^&]*|msclkid=[^&]*|mc_[^&]*|igshid=[^&]*)(&(utm_[^&]*|fbclid=[^&]*|gclid=[^&]*|msclkid=[^&]*|mc_[^&]*|igshid=[^&]*))*$" "";
+}

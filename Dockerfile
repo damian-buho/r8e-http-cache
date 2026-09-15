@@ -34,6 +34,7 @@ ENV O9S_NGINX_INDEX_TYPE=cache                      \
     O9S_NGINX_PROXY_CACHE_REVALIDATE=on             \
     O9S_NGINX_PROXY_CACHE_USE_STALE="updating error timeout http_500 http_502 http_503 http_504" \
     O9S_NGINX_PROXY_CACHE_VALID_200=90d             \
+    O9S_NGINX_PROXY_CACHE_VALID_206=90d             \
     O9S_NGINX_PROXY_CACHE_VALID_301=90d             \
     O9S_NGINX_PROXY_CACHE_VALID_ANY=1m              \
     O9S_NGINX_PROXY_FORCE_RANGES=on                 \
@@ -76,6 +77,8 @@ ENV B19_HEALTH_EGRESS=false
 
 # Space-separated warm-up URLs, fetched daily; empty keeps the job disabled.
 ENV R8E_HTTP_CACHE_WARMUP_URLS=
+# Slice size for large artifacts; range clients share slice entries.
+ENV R8E_HTTP_CACHE_SLICE=1m
 
 # ENTRYPOINT ["entrypoint.d"] is inherited
 # HEALTHCHECK CMD ["healthcheck.d"] is inherited

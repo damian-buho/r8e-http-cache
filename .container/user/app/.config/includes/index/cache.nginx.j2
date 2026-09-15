@@ -5,7 +5,15 @@ SPDX-License-Identifier: MIT
 #}
 
     proxy_cache proxy-cache;
-    proxy_cache_key "$scheme$upstream_host$request_uri";
+    proxy_cache_key "$scheme$upstream_host$upstream_port$upstream_path$cache_qs$slice_range";
+    slice {{ ENV.R8E_HTTP_CACHE_SLICE }};
+
+    # Server-level valid replaces the http set, so it repeats every code.
+    proxy_cache_valid 200 {{ ENV.O9S_NGINX_PROXY_CACHE_VALID_200 }};
+    proxy_cache_valid 206 {{ ENV.O9S_NGINX_PROXY_CACHE_VALID_206 }};
+    proxy_cache_valid 301 {{ ENV.O9S_NGINX_PROXY_CACHE_VALID_301 }};
+    proxy_cache_valid 404 {{ ENV.O9S_NGINX_PROXY_CACHE_VALID_404 }};
+    proxy_cache_valid any {{ ENV.O9S_NGINX_PROXY_CACHE_VALID_ANY }};
 
     add_header X-Cache-Status $upstream_cache_status always;
 
@@ -26,13 +34,15 @@ SPDX-License-Identifier: MIT
         # Split the raw URI so encoding survives; rest keeps path and query as one
         set $upstream_host "";
         set $upstream_port "";
+        set $upstream_path "";
         set $upstream_rest "";
         set $target "";
 
-        if ($request_uri ~ "^/([^/?:]+)(:[0-9]+)?((/|\?).*)?$") {
+        if ($request_uri ~ "^/([^/?:]+)(:[0-9]+)?((/[^?]*)?(\?(.*))?)$") {
             set $upstream_host $1;
             set $upstream_port $2;
             set $upstream_rest $3;
+            set $upstream_path $4;
         }
 
         # Fallback for shapes the split above rejects
@@ -72,6 +82,7 @@ SPDX-License-Identifier: MIT
 
         proxy_pass $target;
         proxy_set_header Host $upstream_host$upstream_port;
+        proxy_set_header Range $slice_range;
         proxy_ssl_name $upstream_host;
         proxy_ssl_server_name on;
     }
@@ -123,6 +134,7 @@ SPDX-License-Identifier: MIT
 
         proxy_pass $redirect_target;
         proxy_set_header Host $redirect_host$redirect_port;
+        proxy_set_header Range $slice_range;
         proxy_ssl_name $redirect_host;
         proxy_ssl_server_name on;
         add_header X-Cache-Status $upstream_cache_status always;

@@ -67,6 +67,14 @@ No secrets required. No Traefik labels.
 - `cache-warmup` prefetches `R8E_HTTP_CACHE_WARMUP_URLS` (space-separated full cache URLs) daily via Ofelia (`no-overlap`), empty by default so the job is a no-op until URLs are provided.
 - Single global 90d TTL is deliberate: stock nginx cannot vary `proxy_cache_valid` per host, so per-host TTLs would need upstream `X-Accel-Expires` cooperation, which is out of scope.
 
+## Large artifacts
+
+- Slices (`R8E_HTTP_CACHE_SLICE`, default 1m) split large responses so concurrent range requests share slice entries; the cache key carries `$slice_range` and each fetch sends `Range $slice_range` upstream. Sliced 206 responses reuse the 90d TTL via an explicit 206 line (a server-level `proxy_cache_valid` replaces the inherited set, so the template repeats every code).
+- Timeouts stay inherited (connect 30s, read 120s, send 30s): read fires on inter-byte gaps, not total time, so 120s already covers slow origins streaming multi-hundred-MB layers. All three remain ENV-tunable.
+- Junk query args (`utm_*`, `fbclid`, `gclid`, `msclkid`, `mc_*`, `igshid`) collapse out of the cache key only when the whole query is junk; anything signature-bearing keeps the full original query in the key while the upstream still receives byte-identical args.
+- Only `GET`/`HEAD` are cached (`proxy_cache_methods` inherited) and only those methods are relayed (method guard above).
+- `proxy_max_temp_file_size` stays 1024m: with 1m slices steady-state temp use is small, and the cap only needs to fit the largest single response buffered for a slow client, comfortably inside the 20G volume.
+
 ## Documentation
 
 - [Project objectives](@docs/goal.md)
