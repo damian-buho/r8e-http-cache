@@ -19,6 +19,7 @@ services:
     environment:
       - LANG
       - TZ
+      - R8E_HTTP_CACHE_ALLOWLIST_REGEX=^r8e-http-cache$
     volumes:
       - r8e-http-cache-data:/app/cache
 networks:

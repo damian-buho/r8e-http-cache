@@ -40,6 +40,9 @@ links:
     url: https://kiota.ch/r8e/http-cache
 org:
   projectfile:
+    architecture:
+      - amd64
+      - arm64
     conventions:
       fragments:
         parents:

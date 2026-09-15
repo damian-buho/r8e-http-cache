@@ -13,7 +13,8 @@ Nginx-based generic HTTP caching proxy.
 ## Key facts
 
 - Base: `o9s/nginx` (single stage)
-- Arch: amd64 only
+- Arch: amd64, arm64
+- Traefik route `http-cache.docker.localhost` (labels in `Dockerfile`)
 
 ## URL format
 
@@ -32,15 +33,15 @@ Nginx-based generic HTTP caching proxy.
 - `O9S_NGINX_INDEX_TYPE=cache`
 - `O9S_NGINX_PROXY_CACHE_VALID_200=90d`
 - `O9S_NGINX_PROXY_CACHE_INACTIVE=90d`
-- `O9S_NGINX_PROXY_CACHE_LOCK=on`, `_REVALIDATE=on`, `_USE_STALE=updating`
+- `O9S_NGINX_PROXY_CACHE_LOCK=on`, `_REVALIDATE=on`, full `_USE_STALE` error set (see contract below)
 
-No secrets required. No Traefik labels.
+No secrets required.
 
 ## Upstream allowlist and SSRF protection
 
 - Only `GET`/`HEAD` are relayed (`limit_except` in both cache locations); only those methods are cached.
 - `map $check_host $upstream_allowed` (`includes/http/145-allowlist.nginx.j2`) is default deny, matched against the bare host without any port suffix. Widen via `R8E_HTTP_CACHE_ALLOWLIST_REGEX` (unanchored `~*` pattern, e.g. `^(registry\.example\.com|.*\.example\.org)$`). Local dev override: `R8E_HTTP_CACHE_ALLOWLIST_REGEX='.*'`.
-- `map $upstream_host $upstream_blocked` in the same file rejects literal loopback, private, link-local, and cloud-metadata targets even when the allowlist is widened. A regex alone cannot stop DNS rebinding, so the allowlist stays the real gate: `proxy_pass` uses a variable, hence resolution happens per request through `O9S_NGINX_RESOLVER` (default Docker `127.0.0.11`, `ipv6=off`), and operators must keep interior names out of that resolver view and firewall egress accordingly.
+- `map $check_host $upstream_blocked` in the same file rejects literal loopback, private, link-local, and cloud-metadata targets even when the allowlist is widened. A regex alone cannot stop DNS rebinding, so the allowlist stays the real gate: `proxy_pass` uses a variable, hence resolution happens per request through `O9S_NGINX_RESOLVER` (default Docker `127.0.0.11`, `ipv6=off`), and operators must keep interior names out of that resolver view and firewall egress accordingly.
 - Host shape is validated before `proxy_pass`: empty, userinfo (`@`), and trailing-dot hosts get 400; blocked/denied hosts get 403.
 
 ## Stale-serving contract
@@ -77,9 +78,11 @@ No secrets required. No Traefik labels.
 
 ## Documentation
 
-- [Project objectives](@docs/goal.md)
-- [Fitness criteria and acceptance](@docs/fit.md)
-- [Completed features](@docs/done.md)
-- [Known limitations](@docs/caveats.md)
-- [Future plans](@docs/roadmap.md)
-- [Available make targets](@docs/MAKEFILE.md)
+- [HTTP caching proxy](docs/features.d/http-caching.md)
+- [Available make targets](docs/MAKEFILE.md)
+
+## Regression tests
+
+- `test.d/1500-cache-render.sh` asserts the rendered config carries every fix: slice key, method guard, policy maps, redirect chain, status endpoint, cache log format.
+- `test.d/1600-cache-live.sh` drives the running cache against a throwaway nginx upstream on the service name (`r8e-http-cache:18080` plain, `:18443` TLS with a per-run self-signed cert). Positives run only where the allowlist admits that name (CI pipeline sets `^r8e-http-cache$`); under default deny they skip with a log line while the refusal assertions still run.
+- Live STALE-status is not asserted: expiring an entry needs time travel, so the suite proves warm-serving-while-down plus the `use_stale` render assertion instead.
