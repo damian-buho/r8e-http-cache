@@ -74,6 +74,9 @@ RUN --mount=type=bind,from=fetch,source=.,target=/fetch                         
 # This image serves stale from cache during an outage, so lost outside reads as healthy.
 ENV B19_HEALTH_EGRESS=false
 
+# Space-separated warm-up URLs, fetched daily; empty keeps the job disabled.
+ENV R8E_HTTP_CACHE_WARMUP_URLS=
+
 # ENTRYPOINT ["entrypoint.d"] is inherited
 # HEALTHCHECK CMD ["healthcheck.d"] is inherited
 
@@ -83,3 +86,6 @@ LABEL traefik.http.routers.r8e-http-cache.rule="Host(`http-cache.docker.localhos
 LABEL traefik.http.routers.r8e-http-cache.entrypoints=web,websecure
 LABEL traefik.http.routers.r8e-http-cache.middlewares=redirect-to-https@file
 LABEL traefik.http.services.r8e-http-cache.loadbalancer.server.port=${O9S_NGINX_HTTP_PORT}
+LABEL ofelia.job-exec.http-cache-warmup.command="cache-warmup"
+LABEL ofelia.job-exec.http-cache-warmup.no-overlap="true"
+LABEL ofelia.job-exec.http-cache-warmup.schedule="@daily"

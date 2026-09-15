@@ -60,6 +60,13 @@ No secrets required. No Traefik labels.
 - Access log uses the `cache` format: the default fields plus `cache=$upstream_cache_status host=$upstream_host target=$target`. Hit ratio is `grep -o 'cache=[A-Z]*' access.log | sort | uniq -c` with values MISS/HIT/EXPIRED/STALE/UPDATING/BYPASS.
 - `X-Cache-Status` / `X-Upstream-Host` / `X-Upstream-Target` are diagnostic-only. They are emitted from config at serve time, never stored in cache entries: on a HIT the location still runs and the headers describe the current request, so a HIT can never carry a previous MISS's values.
 
+## Invalidation, bypass, warm-up
+
+- No network purge endpoint exists: `proxy_cache_purge` is Plus-only and not compiled into `o9s/nginx`. Purging needs container or volume access, which is the restriction. Per entry: `hex=$(printf '%s' '<scheme><host><request_uri>' | md5sum | cut -d' ' -f1)` with no separators (e.g. `httpsregistry.example.com/org/pkg-1.0.tgz`), then `find /app/cache/proxy -type f -name "$hex" -delete`. The next fetch MISSes and refills; the stale index entry ages out via the loader.
+- `?nocache=1` (or `?comment=`) bypasses lookup and stores fresh, but under the bypassed URI, so it never heals the original entry. `Pragma: no-cache` or any `Authorization` header skips storing entirely: authenticated fetches always MISS and never poison the cache.
+- `cache-warmup` prefetches `R8E_HTTP_CACHE_WARMUP_URLS` (space-separated full cache URLs) daily via Ofelia (`no-overlap`), empty by default so the job is a no-op until URLs are provided.
+- Single global 90d TTL is deliberate: stock nginx cannot vary `proxy_cache_valid` per host, so per-host TTLs would need upstream `X-Accel-Expires` cooperation, which is out of scope.
+
 ## Documentation
 
 - [Project objectives](@docs/goal.md)

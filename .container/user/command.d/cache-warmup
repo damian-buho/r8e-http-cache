@@ -1,0 +1,19 @@
+#!/usr/bin/env bash
+
+# SPDX-FileCopyrightText: 2026 Damián Búho <damian.buho@proton.me>
+#
+# SPDX-License-Identifier: MIT
+
+  set -eou pipefail
+
+  # Empty list keeps the scheduled job disabled by default.
+  if [ -z "${R8E_HTTP_CACHE_WARMUP_URLS:-}" ]; then
+    printf 'cache-warmup: no URLs listed, skipping\n'
+    exit 0
+  fi
+
+  # shellcheck disable=SC2086 # space-separated URL list splits here by design
+  for _url in ${R8E_HTTP_CACHE_WARMUP_URLS}; do
+    _code="$(curl --silent --output /dev/null --write-out '%{http_code}' --max-time 300 "${_url}" || true)"
+    printf 'cache-warmup: %s -> %s\n' "${_url}" "${_code:-unreachable}"
+  done
