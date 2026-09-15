@@ -35,6 +35,11 @@ No secrets required. No Traefik labels.
 - `map $upstream_host $upstream_blocked` in the same file rejects literal loopback, private, link-local, and cloud-metadata targets even when the allowlist is widened. A regex alone cannot stop DNS rebinding, so the allowlist stays the real gate: `proxy_pass` uses a variable, hence resolution happens per request through `O9S_NGINX_RESOLVER` (default Docker `127.0.0.11`, `ipv6=off`), and operators must keep interior names out of that resolver view and firewall egress accordingly.
 - Host shape is validated before `proxy_pass`: empty, userinfo (`@`), and trailing-dot hosts get 400; blocked/denied hosts get 403.
 
+## Stale-serving contract
+
+- Warm entry plus dead upstream serves the stale body with `X-Cache-Status: STALE` (`proxy_cache_use_stale` covers `updating error timeout http_500 http_502 http_503 http_504`; `background_update on` revalidates in the background while `lock on` serializes thundering herds).
+- Cold miss plus dead upstream has nothing to serve, so the upstream error (502/504) reaches the client. That is expected, not a bug.
+
 ## Documentation
 
 - [Project objectives](@docs/goal.md)
