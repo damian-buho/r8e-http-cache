@@ -5,7 +5,8 @@ SPDX-License-Identifier: MIT
 #}
 
 # Upstream allowlist for the cache index. Default deny: empty regex emits no rule.
-map $upstream_host $upstream_allowed {
+# Both maps read $check_host, set to the bare direct or redirect host per location.
+map $check_host $upstream_allowed {
     default 0;
 {% if ENV.R8E_HTTP_CACHE_ALLOWLIST_REGEX is defined and ENV.R8E_HTTP_CACHE_ALLOWLIST_REGEX != "" %}
     "~*{{ ENV.R8E_HTTP_CACHE_ALLOWLIST_REGEX }}" 1;
@@ -13,7 +14,7 @@ map $upstream_host $upstream_allowed {
 }
 
 # Literal SSRF block as defense in depth behind the allowlist above.
-map $upstream_host $upstream_blocked {
+map $check_host $upstream_blocked {
     default 0;
     "~*(^|\.)localhost$" 1;
     "~*^metadata\.google\.internal$" 1;

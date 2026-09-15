@@ -9,22 +9,33 @@ SPDX-License-Identifier: MIT
 
     add_header X-Cache-Status $upstream_cache_status always;
 
+    # Server level so @redirect inherits it and chains multiple hops
+    error_page 301 302 303 307 308 = @redirect;
+
+    # ------------------------------------------------------------------
+    location = / {
+        return 400;
+    }
+
     # ------------------------------------------------------------------
     location / {
         # Only cacheable methods are ever relayed upstream
         limit_except GET HEAD {
             deny all;
         }
-        # Extract first path component as upstream domain
+        # Split the raw URI so encoding survives; rest keeps path and query as one
         set $upstream_host "";
-        set $upstream_path "";
+        set $upstream_port "";
+        set $upstream_rest "";
         set $target "";
 
-        if ($uri ~ "^/([^/]+)(/.*)?$") {
+        if ($request_uri ~ "^/([^/?:]+)(:[0-9]+)?((/|\?).*)?$") {
             set $upstream_host $1;
-            set $upstream_path $2;
+            set $upstream_port $2;
+            set $upstream_rest $3;
         }
 
+        # Fallback for shapes the split above rejects
         if ($upstream_host = "") {
             return 400;
         }
@@ -39,6 +50,9 @@ SPDX-License-Identifier: MIT
             return 400;
         }
 
+        # Policy maps read the bare host without any port suffix
+        set $check_host $upstream_host;
+
         # Literal interior targets never leave this box
         if ($upstream_blocked = 1) {
             return 403;
@@ -52,17 +66,14 @@ SPDX-License-Identifier: MIT
         add_header X-Cache-Status $upstream_cache_status always;
         add_header X-Upstream-Host $upstream_host always;
 
-        # Build target URL
-        set $target "https://$upstream_host$upstream_path$is_args$args";
+        # Build target URL from raw parts so bytes survive untouched
+        set $target "https://$upstream_host$upstream_port$upstream_rest";
         add_header X-Upstream-Target $target always;
 
         proxy_pass $target;
-        proxy_set_header Host $upstream_host;
+        proxy_set_header Host $upstream_host$upstream_port;
         proxy_ssl_name $upstream_host;
         proxy_ssl_server_name on;
-
-        # Redirects get handled internally instead of passed to clients
-        error_page 301 302 303 307 308 = @redirect;
     }
 
     # ------------------------------------------------------------------
@@ -73,12 +84,46 @@ SPDX-License-Identifier: MIT
             deny all;
         }
 
+        # One marker per hop; six in a row means a loop
+        set $rh "${rh}x";
+        if ($rh ~ "^xxxxxx$") {
+            return 508;
+        }
+
         set $new $upstream_http_location;
         if ($new = "") { return 502; }
 
-        proxy_pass $new;
-        proxy_set_header Host $upstream_host;
-        proxy_ssl_name $upstream_host;
+        # Same-host relative targets resolve against the original upstream
+        set $redirect_host $upstream_host;
+        set $redirect_port $upstream_port;
+        set $redirect_target "";
+
+        if ($new ~ "^/[^/]") {
+            set $redirect_target "https://$upstream_host$upstream_port$new";
+        }
+
+        # Absolute targets must be https and carry an explicit host
+        if ($new ~* "^https://([^/:?#]+)(:[0-9]+)?") {
+            set $redirect_host $1;
+            set $redirect_port $2;
+            set $redirect_target $new;
+        }
+
+        if ($redirect_target = "") { return 502; }
+        if ($redirect_host ~ "@") { return 502; }
+
+        # Redirect targets clear the same policy as direct fetches
+        set $check_host $redirect_host;
+        if ($upstream_blocked = 1) {
+            return 403;
+        }
+        if ($upstream_allowed = 0) {
+            return 403;
+        }
+
+        proxy_pass $redirect_target;
+        proxy_set_header Host $redirect_host$redirect_port;
+        proxy_ssl_name $redirect_host;
         proxy_ssl_server_name on;
         add_header X-Cache-Status $upstream_cache_status always;
         add_header X-Upstream-Redirect $new always;

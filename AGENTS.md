@@ -17,7 +17,15 @@ Nginx-based generic HTTP caching proxy.
 
 ## URL format
 
-`/{host}/{path}` — the first path segment is used as the upstream host.
+`/{host}[:port]/{path}` — the first path segment is used as the upstream host. It is split off `$request_uri` (not `$uri`) so percent-encoding survives byte-identical, and path plus query forward as one part with no arg re-append.
+
+- Upstreams are https only. Plain-http origins are out of scope: an http leg would let a MITM poison the cache, so there is no scheme selector. Non-https redirect targets are refused.
+- A bare `/` returns 400 via `location = /`; unparsable shapes (bad ports, `//` prefixes) fall through to the same 400 inside `location /`.
+
+## Redirects
+
+- 301/302/303/307/308 are followed internally via a server-level `error_page`, so chains work across hops. Each hop appends a marker and the sixth returns 508, which terminates loops.
+- Every redirect target clears the same policy as a direct fetch: https only, same allowlist, same interior/metadata block. Relative `/path` targets resolve against the original upstream; anything else unusable is a 502.
 
 ## Cache tuning ENV
 
@@ -31,7 +39,7 @@ No secrets required. No Traefik labels.
 ## Upstream allowlist and SSRF protection
 
 - Only `GET`/`HEAD` are relayed (`limit_except` in both cache locations); only those methods are cached.
-- `map $upstream_host $upstream_allowed` (`includes/http/145-allowlist.nginx.j2`) is default deny. Widen via `R8E_HTTP_CACHE_ALLOWLIST_REGEX` (unanchored `~*` pattern, e.g. `^(registry\.example\.com|.*\.example\.org)$`). Local dev override: `R8E_HTTP_CACHE_ALLOWLIST_REGEX='.*'`.
+- `map $check_host $upstream_allowed` (`includes/http/145-allowlist.nginx.j2`) is default deny, matched against the bare host without any port suffix. Widen via `R8E_HTTP_CACHE_ALLOWLIST_REGEX` (unanchored `~*` pattern, e.g. `^(registry\.example\.com|.*\.example\.org)$`). Local dev override: `R8E_HTTP_CACHE_ALLOWLIST_REGEX='.*'`.
 - `map $upstream_host $upstream_blocked` in the same file rejects literal loopback, private, link-local, and cloud-metadata targets even when the allowlist is widened. A regex alone cannot stop DNS rebinding, so the allowlist stays the real gate: `proxy_pass` uses a variable, hence resolution happens per request through `O9S_NGINX_RESOLVER` (default Docker `127.0.0.11`, `ipv6=off`), and operators must keep interior names out of that resolver view and firewall egress accordingly.
 - Host shape is validated before `proxy_pass`: empty, userinfo (`@`), and trailing-dot hosts get 400; blocked/denied hosts get 403.
 
