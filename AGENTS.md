@@ -57,7 +57,7 @@ No secrets required.
 
 ## Observability
 
-- Status endpoint `GET /status/nginx` (via `enable-status`) answers on localhost only (`allow 127.0.0.1; deny all`) and is also what the image healthcheck curls.
+- Status endpoint `GET /status/nginx` (mandatory base server include `server/status.nginx`, never list `enable-status` under `O9S_NGINX_INCLUDE_OPTIONAL` — that file no longer exists) answers on localhost only (`allow 127.0.0.1; deny all`) and is also what the image healthcheck curls.
 - Access log uses the `cache` format: the default fields plus `cache=$upstream_cache_status host=$upstream_host target=$target`. Hit ratio is `grep -o 'cache=[A-Z]*' access.log | sort | uniq -c` with values MISS/HIT/EXPIRED/STALE/UPDATING/BYPASS.
 - `X-Cache-Status` / `X-Upstream-Host` / `X-Upstream-Target` are diagnostic-only. They are emitted from config at serve time, never stored in cache entries: on a HIT the location still runs and the headers describe the current request, so a HIT can never carry a previous MISS’s values.
 

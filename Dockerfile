@@ -21,7 +21,6 @@ ARG TARGETARCH
 
 ENV O9S_NGINX_INDEX_TYPE=cache                      \
     O9S_NGINX_ACCESS_LOG="/dev/stdout cache"        \
-    O9S_NGINX_INCLUDE_OPTIONAL=enable-status        \
     O9S_NGINX_PROXY_BUFFERS_NUM=32                  \
     O9S_NGINX_PROXY_BUFFERS_SIZE=64k                \
     O9S_NGINX_PROXY_BUFFER_SIZE=16k                 \

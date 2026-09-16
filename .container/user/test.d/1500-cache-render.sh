@@ -10,7 +10,7 @@
 
   _cfg="$(mktemp)"
   trap 'rm -f "${_cfg}"' EXIT
-  show-config > "${_cfg}"
+  show-config default > "${_cfg}"
 
   _fail=0
   present() {
@@ -72,6 +72,12 @@
   absent '$proxy_host'
   # Observability surface.
   present 'location /status/nginx'
+  if [ "$(grep -c 'location /status/nginx' "${_cfg}")" -eq 1 ]; then
+    printf 'cache-render: present: single status location\n'
+  else
+    printf 'cache-render: MISSING: single status location\n'
+    _fail=1
+  fi
   present 'log_format cache'
   present '/dev/stdout cache'
   present 'cache=$upstream_cache_status host=$upstream_host target=$target'
