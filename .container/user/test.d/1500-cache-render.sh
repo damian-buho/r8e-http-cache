@@ -11,6 +11,11 @@
   _cfg="$(mktemp)"
   trap 'rm -f "${_cfg}"' EXIT
   show-config default > "${_cfg}"
+  # show-config expands only the server block; the http-block snippets
+  # (allowlist maps, cache tuning, log formats) render beside it.
+  for _inc in "${XDG_CONFIG_HOME}/includes/http/"*.nginx; do
+    [ -f "${_inc}" ] && cat "${_inc}" >> "${_cfg}"
+  done
 
   _fail=0
   present() {

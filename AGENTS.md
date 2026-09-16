@@ -83,6 +83,7 @@ No secrets required.
 
 ## Regression tests
 
+- Run as `make dc-up-d container-test`: `container-test` alone reuses the running dev container, so a rebuild without `dc-up-d` tests the stale image.
 - `test.d/1500-cache-render.sh` asserts the rendered config carries every fix: slice key, method guard, policy maps, redirect chain, status endpoint, cache log format.
 - `test.d/1600-cache-live.sh` drives the running cache against a throwaway nginx upstream on the service name (`r8e-http-cache:18080` plain, `:18443` TLS with a per-run self-signed cert). Positives run only where the allowlist admits that name (CI pipeline sets `^r8e-http-cache$`); under default deny they skip with a log line while the refusal assertions still run.
 - Live STALE-status is not asserted: expiring an entry needs time travel, so the suite proves warm-serving-while-down plus the `use_stale` render assertion instead.
