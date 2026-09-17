@@ -4,12 +4,15 @@
 #
 # SPDX-License-Identifier: MIT
 
+# Single run per container: fixed upstream ports and the persistent cache fail repeats.
+
   set -eou pipefail
 
   _port="${O9S_NGINX_HTTP_PORT:-8080}"
   _self="r8e-http-cache"
   _up_http=18080
   _up_tls=18443
+  # Cache upstreams are https-only, so positives fetch the TLS port below.
   _fail=0
 
   check() {
@@ -33,7 +36,7 @@
   check "$(curl --silent --output /dev/null --write-out '%{http_code}' --max-time 20 --request POST "http://127.0.0.1:${_port}/${_self}:${_up_http}/file" || true)" "403" "POST is refused"
 
   # Positives need the allowlist to admit the throwaway upstream.
-  if [ "$(code_of "http://127.0.0.1:${_port}/${_self}:${_up_http}/probe")" = "403" ]; then
+  if [ "$(code_of "http://127.0.0.1:${_port}/${_self}:${_up_tls}/probe")" = "403" ]; then
     printf 'cache-live: allowlist denies %s, skipping positive fetches\n' "${_self}"
     exit "${_fail}"
   fi
@@ -59,13 +62,14 @@ http {
         server_name ${_self};
         location = /file { return 200 'test-body'; }
         location = /redir { return 301 'https://${_self}:${_up_tls}/final'; }
+        location = /redir-q { return 301 'https://${_self}:${_up_tls}/final?from=redir-q'; }
         location = /final { return 200 'final-body'; }
     }
 }
 EOF
   nginx -c "${_tmp}/upstream.conf"
   for _i in 1 2 3 4 5; do
-    if code_of "http://127.0.0.1:${_up_http}/file" | grep -q '200'; then
+    if curl --silent --insecure --output /dev/null --fail "https://127.0.0.1:${_up_tls}/file" 2>/dev/null; then
       break
     fi
     sleep 1
@@ -80,15 +84,15 @@ EOF
   }
 
   # Second fetch of the same URL is a HIT with identical bytes.
-  check "$(fetch "http://127.0.0.1:${_port}/${_self}:${_up_http}/file" "${_tmp}/first")" "200" "first fetch is 200"
+  check "$(fetch "http://127.0.0.1:${_port}/${_self}:${_up_tls}/file" "${_tmp}/first")" "200" "first fetch is 200"
   check "$(status_of)" "MISS" "first fetch is MISS"
-  check "$(fetch "http://127.0.0.1:${_port}/${_self}:${_up_http}/file" "${_tmp}/second")" "200" "second fetch is 200"
+  check "$(fetch "http://127.0.0.1:${_port}/${_self}:${_up_tls}/file" "${_tmp}/second")" "200" "second fetch is 200"
   check "$(status_of)" "HIT" "second fetch is HIT"
   check "$(cat "${_tmp}/second")" "test-body" "HIT body matches"
-  check "$(grep -cF "${_self}:${_up_http} GET /file " "${_tmp}/upstream-access.log" || true)" "1" "upstream saw one fetch with correct Host"
+  check "$(grep -cF "${_self}:${_up_tls} GET /file " "${_tmp}/upstream-access.log" || true)" "1" "upstream saw one fetch with correct Host"
 
   # Absolute redirect targets resolve through the same fetch path.
-  check "$(fetch "http://127.0.0.1:${_port}/${_self}:${_up_http}/redir" "${_tmp}/redir")" "200" "redirect lands on 200"
+  check "$(fetch "http://127.0.0.1:${_port}/${_self}:${_up_tls}/redir" "${_tmp}/redir")" "200" "redirect lands on 200"
   check "$(cat "${_tmp}/redir")" "final-body" "redirect serves final body"
   if grep -qi '^x-upstream-redirect:' "${_hdrs}"; then
     printf 'cache-live: ok: redirect header present\n'
@@ -97,10 +101,15 @@ EOF
     _fail=1
   fi
 
+  # Target query strings survive the hop; the original args never leak in.
+  check "$(fetch "http://127.0.0.1:${_port}/${_self}:${_up_tls}/redir-q" "${_tmp}/redir_q")" "200" "query redirect lands on 200"
+  check "$(cat "${_tmp}/redir_q")" "final-body" "query redirect serves final body"
+  check "$(grep -cF "GET /final?from=redir-q " "${_tmp}/upstream-access.log" || true)" "1" "upstream saw redirect query"
+
   # A warm entry keeps serving after the origin dies.
   nginx -c "${_tmp}/upstream.conf" -s stop
   sleep 1
-  check "$(fetch "http://127.0.0.1:${_port}/${_self}:${_up_http}/file" "${_tmp}/down")" "200" "warm entry serves while upstream is down"
+  check "$(fetch "http://127.0.0.1:${_port}/${_self}:${_up_tls}/file" "${_tmp}/down")" "200" "warm entry serves while upstream is down"
   check "$(cat "${_tmp}/down")" "test-body" "down body matches"
 
   exit "${_fail}"
