@@ -67,6 +67,18 @@
   present 'error_page 301 302 303 307 308 = @redirect'
   present 'location @redirect'
   present 'return 508'
+  # Redirect vars come from maps so proxy_pass sees them on error_page entry.
+  present 'map $new $redirect_target'
+  present 'map $new $redirect_host'
+  present 'map $new $redirect_port'
+  present 'map $new $redirect_path'
+  present 'map $new $redirect_query'
+  present 'rewrite ^.*$ $redirect_path break;'
+  present 'set $args $redirect_query;'
+  present 'proxy_pass https://$redirect_host$redirect_port;'
+  present 'proxy_cache_key "$scheme$redirect_target$slice_range"'
+  absent 'proxy_pass $redirect_target;'
+  absent 'set $redirect_target $new'
   present 'location = /'
   # Correct upstream identity per fetch.
   present 'proxy_set_header Host $upstream_host$upstream_port'

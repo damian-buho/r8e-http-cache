@@ -102,24 +102,6 @@ SPDX-License-Identifier: MIT
         }
 
         set $new $upstream_http_location;
-        if ($new = "") { return 502; }
-
-        # Same-host relative targets resolve against the original upstream
-        set $redirect_host $upstream_host;
-        set $redirect_port $upstream_port;
-        set $redirect_target "";
-
-        if ($new ~ "^/[^/]") {
-            set $redirect_target "https://$upstream_host$upstream_port$new";
-        }
-
-        # Absolute targets must be https and carry an explicit host
-        if ($new ~* "^https://([^/:?#]+)(:[0-9]+)?") {
-            set $redirect_host $1;
-            set $redirect_port $2;
-            set $redirect_target $new;
-        }
-
         if ($redirect_target = "") { return 502; }
         if ($redirect_host ~ "@") { return 502; }
 
@@ -132,7 +114,12 @@ SPDX-License-Identifier: MIT
             return 403;
         }
 
-        proxy_pass $redirect_target;
+        # proxy_pass with a variable reuses the original URI on error_page entry.
+        # The args assignment precedes the rewrite since break halts the phase.
+        set $args $redirect_query;
+        rewrite ^.*$ $redirect_path break;
+        proxy_cache_key "$scheme$redirect_target$slice_range";
+        proxy_pass https://$redirect_host$redirect_port;
         proxy_set_header Host $redirect_host$redirect_port;
         proxy_set_header Range $slice_range;
         proxy_ssl_name $redirect_host;

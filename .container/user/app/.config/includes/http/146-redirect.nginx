@@ -1,0 +1,37 @@
+# SPDX-FileCopyrightText: 2026 Damián Búho <damian.buho@proton.me>
+#
+# SPDX-License-Identifier: MIT
+
+# Redirect target splitter for the cache index. All maps read $new, the raw Location.
+map $new $redirect_target {
+    default "";
+    "~^/[^/]"                      "https://$upstream_host$upstream_port$new";
+    "~*^https://[^/:?#]+(:[0-9]+)?" $new;
+}
+
+# Same-host relative targets resolve against the original upstream.
+map $new $redirect_host {
+    default "";
+    "~^/[^/]"           $upstream_host;
+    "~*^https://([^/:?#]+)" $1;
+}
+
+# Empty port match means default 443, same as the direct fetch path.
+map $new $redirect_port {
+    default "";
+    "~^/[^/]"           $upstream_port;
+    "~*^https://[^/:?#]+(:[0-9]+)?" $1;
+}
+
+# Bare-host targets carry no path, so they fall back to root.
+map $new $redirect_path {
+    default              /;
+    "~^(/[^?#]*)"        $1;
+    "~*^https://[^/]+(/[^?#]+)" $1;
+}
+
+# Fragments never leave the client, so the query stops at any hash.
+map $new $redirect_query {
+    default         "";
+    ~\?([^#]*)$    $1;
+}
