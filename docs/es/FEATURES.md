@@ -38,7 +38,7 @@ SPDX-License-Identifier: MIT
 - Solo se retransmiten los métodos cacheables, y los destinos internos o de metadatos nunca son alcanzables.
 - Las formas hostiles de host (trucos con userinfo, puntos finales, puertos inválidos) se rechazan antes de contactar a ningún origen.
 
-## Heredado de B19/Ubuntu
+## Heredado de B19 / Ubuntu
 
 ### Caché APT persistente entre compilaciones
 
