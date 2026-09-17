@@ -36,7 +36,7 @@ SPDX-License-Identifier: MIT
 - Only cacheable methods are relayed, and interior or metadata targets are never reachable.
 - Hostile host shapes (userinfo tricks, trailing dots, bad ports) are refused before any upstream contact.
 
-## Inherited from B19/Ubuntu
+## Inherited from B19 / Ubuntu
 
 ### Persistent APT cache across builds
 
