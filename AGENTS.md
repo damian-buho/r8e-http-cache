@@ -27,6 +27,7 @@ Nginx-based generic HTTP caching proxy.
 
 - 301/302/303/307/308 are followed internally via a server-level `error_page`, so chains work across hops. Each hop appends a marker and the sixth returns 508, which terminates loops.
 - Every redirect target clears the same policy as a direct fetch: https only, same allowlist, same interior/metadata block. Relative `/path` targets resolve against the original upstream; anything else unusable is a 502.
+- Target splitting lives in `map` blocks (`includes/http/146-redirect.nginx`): `proxy_pass` with a variable reuses the original URI on `error_page` entry, so `@redirect` rewrites to the target path first and caches under its own key.
 
 ## Cache tuning ENV
 
@@ -42,6 +43,7 @@ No secrets required.
 - Only `GET`/`HEAD` are relayed (`limit_except` in both cache locations); only those methods are cached.
 - `map $check_host $upstream_allowed` (`includes/http/145-allowlist.nginx.j2`) is default deny, matched against the bare host without any port suffix. Widen via `R8E_HTTP_CACHE_ALLOWLIST_REGEX` (unanchored `~*` pattern, e.g. `^(registry\.example\.com|.*\.example\.org)$`). Local dev override: `R8E_HTTP_CACHE_ALLOWLIST_REGEX='.*'`.
 - `map $check_host $upstream_blocked` in the same file rejects literal loopback, private, link-local, and cloud-metadata targets even when the allowlist is widened. A regular expression alone cannot stop DNS rebinding, so the allowlist stays the real gate: `proxy_pass` uses a variable, hence resolution happens per request through `O9S_NGINX_RESOLVER` (default Docker `127.0.0.11`, `ipv6=off`), and operators must keep interior names out of that resolver view and firewall egress accordingly.
+- `entrypoint.d/0950-resolver.sh` adopts the nameservers from `/etc/resolv.conf` while `O9S_NGINX_RESOLVER` still carries the Docker default, so podman/CI runtimes resolve service names too; an explicit override is left alone.
 - Host shape is validated before `proxy_pass`: empty, userinfo (`@`), and trailing-dot hosts get 400; blocked/denied hosts get 403.
 
 ## Stale-serving contract
@@ -85,5 +87,5 @@ No secrets required.
 
 - Run as `make dc-up-d container-test`: `container-test` alone reuses the running dev container, so a rebuild without `dc-up-d` tests the stale image.
 - `test.d/1500-cache-render.sh` asserts the rendered config carries every fix: slice key, method guard, policy maps, redirect chain, status endpoint, cache log format.
-- `test.d/1600-cache-live.sh` drives the running cache against a throwaway nginx upstream on the service name (`r8e-http-cache:18080` plain, `:18443` TLS with a per-run self-signed cert). Positives run only where the allowlist admits that name (CI pipeline sets `^r8e-http-cache$`); under default deny they skip with a log line while the refusal assertions still run.
+- `test.d/1600-cache-live.sh` drives the running cache against a throwaway nginx upstream on the service name (`r8e-http-cache:18080` plain, `:18443` TLS with a per-run self-signed cert). Positives fetch the TLS port since cache upstreams are https-only, and run only where the allowlist admits that name (CI pipeline sets `^r8e-http-cache$`); under default deny they skip with a log line while the refusal assertions still run.
 - Live STALE-status is not asserted: expiring an entry needs time travel, so the suite proves warm-serving-while-down plus the `use_stale` render assertion instead.
