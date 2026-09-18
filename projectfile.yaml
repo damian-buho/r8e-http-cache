@@ -36,6 +36,7 @@ links:
       es: R8E / HTTP Cache en kiota.ch
       uk: R8E / HTTP Cache на kiota.ch
     preferred: true
+    priority: 10
     type: source-code
     url: https://kiota.ch/r8e/http-cache
 org:
