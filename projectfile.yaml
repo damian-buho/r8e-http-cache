@@ -79,7 +79,6 @@ org:
     architecture:
       - amd64
       - arm64
-      - riscv64
     conventions:
       fragments:
         parents:
