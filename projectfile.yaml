@@ -18,9 +18,12 @@ identity:
   version: 1.2.0
 includes:
   - .makefile/b19/ci.yaml
+  - .makefile/b19/traits/release.yaml
   - .makefile/library/images/nginx.yaml
   - .projectfile/vulnerabilities.yaml
+  - https://kiota.ch/damian-buho/metadata/raw/branch/main/forge/github.yaml
   - https://kiota.ch/damian-buho/metadata/raw/branch/main/include.yaml
+  - https://kiota.ch/damian-buho/metadata/raw/branch/main/registry/dockerhub.yaml
   - https://kiota.ch/r8e/metadata/raw/branch/main/include.yaml
 keywords:
   - nginx
@@ -39,6 +42,38 @@ links:
     priority: 10
     type: source-code
     url: https://kiota.ch/r8e/http-cache
+  - label:
+      en: R8E / HTTP Cache on GitHub
+      es: R8E / HTTP Cache en GitHub
+      uk: R8E / HTTP Cache на GitHub
+    priority: 80
+    tags:
+      - public
+      - badges
+      - badges-github
+    type: source-code
+    url: https://github.com/damian-buho/r8e-http-cache
+  - label:
+      en: Issues on GitHub
+      es: Incidencias en GitHub
+      uk: Задачі на GitHub
+    priority: 80
+    tags:
+      - support
+    type: bugs
+    url: https://github.com/damian-buho/r8e-http-cache/issues
+  - label:
+      en: Packages on Docker Hub
+      es: Paquetes en Docker Hub
+      uk: Пакунки на Docker Hub
+    type: package-registry
+    url: https://hub.docker.com/r/damianbuho/r8e-http-cache
+  - label:
+      en: Packages on GHCR
+      es: Paquetes en GHCR
+      uk: Пакунки на GHCR
+    type: package-registry
+    url: https://github.com/damian-buho/r8e-http-cache/pkgs/container/r8e%2Fhttp-cache
 org:
   projectfile:
     architecture:
@@ -55,5 +90,8 @@ repositories:
     role: origin
     type: git
     url: ssh://git@kiota.ch/r8e/http-cache.git
+  - role: mirror
+    type: git
+    url: git@github.com:damian-buho/r8e-http-cache.git
 technologies:
   - c
