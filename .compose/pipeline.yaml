@@ -27,4 +27,4 @@ networks:
     name: ${M6E_COMPOSE_PROJECT_NAME}-network
 volumes:
   r8e-http-cache-data:
-    name: r8e-http-cache-data
+    name: ${M6E_COMPOSE_PROJECT_NAME}-data
