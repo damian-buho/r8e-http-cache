@@ -19,6 +19,7 @@ identity:
 includes:
   - .makefile/b19/ci.yaml
   - .makefile/b19/traits/release.yaml
+  - .makefile/container/traits/readme-service.yaml
   - .makefile/library/images/nginx.yaml
   - .projectfile/vulnerabilities.yaml
   - https://kiota.ch/damian-buho/metadata/raw/branch/main/forge/github.yaml
@@ -76,6 +77,16 @@ links:
     url: https://github.com/damian-buho/r8e-http-cache/pkgs/container/r8e%2Fhttp-cache
 org:
   projectfile:
+    artifacts:
+      http-cache:
+        kind: service
+        summary:
+          en: Caching HTTP proxy
+          es: Proxy HTTP con caché
+          uk: Кешувальний HTTP-проксі
+        ports:
+          - port: 8080
+            name: http
     architecture:
       - amd64
       - arm64

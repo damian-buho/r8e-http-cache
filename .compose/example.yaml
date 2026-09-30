@@ -1,0 +1,17 @@
+# SPDX-FileCopyrightText: 2026 Damián Búho <damian.buho@proton.me>
+#
+# SPDX-License-Identifier: MIT
+
+---
+services:
+  http-cache:
+    image: docker.io/damianbuho/r8e-http-cache:latest
+    ports:
+      - "8080:8080"
+    volumes:
+      - http-cache:/app/cache
+    cap_drop: [ALL]
+    security_opt: [no-new-privileges:true]
+    restart: unless-stopped
+volumes:
+  http-cache:
