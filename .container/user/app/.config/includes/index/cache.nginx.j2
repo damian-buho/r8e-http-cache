@@ -19,6 +19,17 @@ SPDX-License-Identifier: MIT
 
     # Server level so @redirect inherits it and chains multiple hops
     error_page 301 302 303 307 308 = @redirect;
+    # Split the raw URI so encoding survives; rest keeps path and query as one
+    set $upstream_host "";
+    set $upstream_port "";
+    set $upstream_path "";
+    set $upstream_rest "";
+    if ($request_uri ~ "^/([^/?:]+)(:[0-9]+)?((/[^?]*)?(\?(.*))?)$") {
+        set $upstream_host $1;
+        set $upstream_port $2;
+        set $upstream_rest $3;
+        set $upstream_path $4;
+    }
 
     # ------------------------------------------------------------------
     location = / {
@@ -31,19 +42,7 @@ SPDX-License-Identifier: MIT
         limit_except GET HEAD {
             deny all;
         }
-        # Split the raw URI so encoding survives; rest keeps path and query as one
-        set $upstream_host "";
-        set $upstream_port "";
-        set $upstream_path "";
-        set $upstream_rest "";
         set $target "";
-
-        if ($request_uri ~ "^/([^/?:]+)(:[0-9]+)?((/[^?]*)?(\?(.*))?)$") {
-            set $upstream_host $1;
-            set $upstream_port $2;
-            set $upstream_rest $3;
-            set $upstream_path $4;
-        }
 
         # Fallback for shapes the split above rejects
         if ($upstream_host = "") {

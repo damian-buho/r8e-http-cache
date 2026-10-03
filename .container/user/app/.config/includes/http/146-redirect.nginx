@@ -13,7 +13,7 @@ map $new $redirect_target {
 map $new $redirect_host {
     default "";
     "~^/[^/]"           $upstream_host;
-    "~*^https://([^/:?#]+)" $1;
+    "~*^https://([^/:?#\r\n]+)" $1;
 }
 
 # Empty port match means default 443, same as the direct fetch path.
@@ -26,12 +26,12 @@ map $new $redirect_port {
 # Bare-host targets carry no path, so they fall back to root.
 map $new $redirect_path {
     default              /;
-    "~^(/[^?#]*)"        $1;
-    "~*^https://[^/]+(/[^?#]+)" $1;
+    "~^(/[^?#\r\n]*)"        $1;
+    "~*^https://[^/]+(/[^?#\r\n]+)" $1;
 }
 
 # Fragments never leave the client, so the query stops at any hash.
 map $new $redirect_query {
     default         "";
-    ~\?([^#]*)$    $1;
+    ~\?([^#\r\n]*)$    $1;
 }

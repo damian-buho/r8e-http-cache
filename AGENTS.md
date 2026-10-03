@@ -28,6 +28,7 @@ Nginx-based generic HTTP caching proxy.
 - 301/302/303/307/308 are followed internally via a server-level `error_page`, so chains work across hops. Each hop appends a marker and the sixth returns 508, which terminates loops.
 - Every redirect target clears the same policy as a direct fetch: https only, same allowlist, same interior/metadata block. Relative `/path` targets resolve against the original upstream; anything else unusable is a 502.
 - Target splitting lives in `map` blocks (`includes/http/146-redirect.nginx`): `proxy_pass` with a variable reuses the original URI on `error_page` entry, so `@redirect` rewrites to the target path first and caches under its own key.
+- gixy gates the rendered config: redirect captures exclude CR/LF and the request split stays at server level, so keep both shapes when editing.
 
 ## Cache tuning ENV
 
