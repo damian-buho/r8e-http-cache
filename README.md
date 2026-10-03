@@ -14,7 +14,7 @@ Community-maintained distribution of Nginx built on B19/Ubuntu. This repository 
 
 ![Project status](https://badges.kiota.ch/static/v1?label=status&message=maintained&color=1d63ed&style=flat-square) [![Last commit on GitHub](https://badges.kiota.ch/github/last-commit/damian-buho/r8e-http-cache?label=last%20commit%20on%20GitHub&style=flat-square)](https://github.com/damian-buho/r8e-http-cache) [![Last commit on kiota.ch](https://badges.kiota.ch/gitea/last-commit/r8e/http-cache?gitea_url=https://kiota.ch&label=last%20commit%20on%20kiota.ch&style=flat-square)](https://kiota.ch/r8e/http-cache)
 
-[![Publish pipeline on GitHub](https://github.com/damian-buho/r8e-http-cache/actions/workflows/published.yaml/badge.svg?style=flat-square)](https://github.com/damian-buho/r8e-http-cache/actions) [![Vulnerability audit on GitHub](https://github.com/damian-buho/r8e-http-cache/actions/workflows/audited.yaml/badge.svg?style=flat-square)](https://github.com/damian-buho/r8e-http-cache/actions) [![Dependency freshness on GitHub](https://github.com/damian-buho/r8e-http-cache/actions/workflows/check-outdated.yaml/badge.svg?style=flat-square)](https://github.com/damian-buho/r8e-http-cache/actions) [![Analysis sweep on GitHub](https://github.com/damian-buho/r8e-http-cache/actions/workflows/analyze.yaml/badge.svg?style=flat-square)](https://github.com/damian-buho/r8e-http-cache/actions)
+[![Publish pipeline on GitHub](https://github.com/damian-buho/r8e-http-cache/actions/workflows/published.yaml/badge.svg?style=flat-square)](https://github.com/damian-buho/r8e-http-cache/actions) [![Vulnerability audit on GitHub](https://github.com/damian-buho/r8e-http-cache/actions/workflows/audited.yaml/badge.svg?style=flat-square)](https://github.com/damian-buho/r8e-http-cache/actions) [![Dependency freshness on GitHub](https://github.com/damian-buho/r8e-http-cache/actions/workflows/check-outdated.yaml/badge.svg?style=flat-square)](https://github.com/damian-buho/r8e-http-cache/actions) [![Analysis sweep on GitHub](https://github.com/damian-buho/r8e-http-cache/actions/workflows/analyzed.yaml/badge.svg?style=flat-square)](https://github.com/damian-buho/r8e-http-cache/actions)
 
 [![Publish pipeline on kiota.ch](https://kiota.ch/r8e/http-cache/badges/workflows/published.yaml/badge.svg?style=flat-square)](https://kiota.ch/r8e/http-cache/actions) [![Vulnerability audit on kiota.ch](https://kiota.ch/r8e/http-cache/badges/workflows/audited.yaml/badge.svg?style=flat-square)](https://kiota.ch/r8e/http-cache/actions) [![Dependency freshness on kiota.ch](https://kiota.ch/r8e/http-cache/badges/workflows/check-outdated.yaml/badge.svg?style=flat-square)](https://kiota.ch/r8e/http-cache/actions) [![Analysis sweep on kiota.ch](https://kiota.ch/r8e/http-cache/badges/workflows/analyze.yaml/badge.svg?style=flat-square)](https://kiota.ch/r8e/http-cache/actions)
 
@@ -119,7 +119,7 @@ For the local dev loop, `make dev-container` brings up the dev-container.
 
 Pipeline entry points:
 
-- `make analyze` — Run the heavy analysis sweep (mutation testing, benchmarks)
+- `make analyzed` — Run the heavy analysis sweep (mutation testing, benchmarks)
 - `make audited` — Re-scan the pinned dependencies and published artifacts for new vulnerabilities
 - `make check-outdated` — Report every pinned dependency that lags upstream
 - `make ready-to-publish` — Run the pseudo-CI pipeline locally — build, test and scan, without publishing
