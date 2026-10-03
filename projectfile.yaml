@@ -20,6 +20,7 @@ identity:
 includes:
   - .makefile/b19/ci.yaml
   - .makefile/b19/traits/release.yaml
+  - .makefile/container/traits/nginx.yaml
   - .makefile/container/traits/readme-service.yaml
   - .makefile/library/images/nginx.yaml
   - .projectfile/vulnerabilities.yaml
@@ -92,6 +93,11 @@ org:
     architecture:
       - amd64
       - arm64
+    ci:
+      nodes:
+        container-ready-to-test:
+          needs:
+            gixy-checked: true
     conventions:
       fragments:
         parents:
