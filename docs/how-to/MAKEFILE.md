@@ -257,6 +257,14 @@ Run a fresh container from the built image (with mounted secrets) and shell into
 
 Run the test.d suite inside the running container
 
+### `gixy`
+
+Statically analyze the rendered nginx config for misconfigurations
+
+`auto-gixy reports/nginx-config/nginx.conf`
+
+> Image: D9T_PYTHON_TOOLS_IMAGE
+
 ### `hadolint`
 
 Lint the Dockerfile for best practices
@@ -1477,9 +1485,17 @@ Report every pinned dependency that lags upstream
 
 Refresh the shared grype, trivy, osv and clamav databases
 
+### `gixy-checked`
+
+Nginx config checked for misconfigurations
+
 ### `inputs-are-ok`
 
 Verify every build input — source, documentation and the projectfile
+
+### `nginx-config-extracted`
+
+Nginx config extracted and ready for analysis
 
 ### `pre-commit`
 
