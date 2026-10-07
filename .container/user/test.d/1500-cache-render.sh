@@ -35,7 +35,7 @@
     fi
   }
   absent() {
-    if grep -vE '^[[:space:]]*#' "${_cfg}" | grep -qF "$1"; then
+    if grep -qF "$1" <<<"$(grep -vE '^[[:space:]]*#' "${_cfg}")"; then
       printf 'cache-render: UNEXPECTED: %s\n' "$1"
       _fail=1
     else
