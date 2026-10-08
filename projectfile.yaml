@@ -19,6 +19,7 @@ identity:
   released: "2026-10-07"
 includes:
   - .makefile/b19/ci.yaml
+  - .makefile/b19/traits/attested-images.yaml
   - .makefile/b19/traits/release.yaml
   - .makefile/b19/traits/signed-images.yaml
   - .makefile/container/traits/nginx.yaml
