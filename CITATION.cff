@@ -26,11 +26,11 @@ contact:
 license: MIT
 repository-code: https://kiota.ch/r8e/http-cache
 keywords:
-  - nginx
+  - build-cache
+  - forward-proxy
   - http-cache
-  - proxy
-  - cache
+  - nginx
   - reverse-proxy
-  - docker
+  - self-hosted
 version: 0.10.1
 date-released: "2026-10-11"

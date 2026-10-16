@@ -12,18 +12,19 @@ identity:
     uk: Дистрибуція Nginx з підтримкою спільноти на основі B19/Ubuntu
   title: R8E / HTTP Cache
   description:
-    en: Community-maintained distribution of Nginx built on B19/Ubuntu. This repository holds only the packaging — Dockerfile, build scripts, and configuration, all MIT-licensed; the upstream Nginx is fetched at build time and retains its own licensing.
-    es: Distribución de Nginx mantenida por la comunidad, construida sobre B19/Ubuntu. Este repositorio contiene únicamente el empaquetado — Dockerfile, scripts de compilación y configuración, todo con licencia MIT; el código original de Nginx se obtiene en tiempo de compilación y conserva su propia licencia.
-    uk: Дистрибуція Nginx з підтримкою спільноти, зібрана на основі B19/Ubuntu. Цей репозиторій містить лише пакування — Dockerfile, скрипти збирання та конфігурацію, усе під ліцензією MIT; вихідний код Nginx отримують під час збирання, і він зберігає власну ліцензію.
+    en: HTTPS caching proxy with allowlisted upstreams, stale serving during outages, and LRU-bounded disk sized for registry artifacts.
+    es: Proxy de caché HTTPS con upstreams de allowlist, servicio stale durante caídas y disco acotado por LRU para artefactos de registros.
+    uk: HTTPS-кешувальний проксі з апстрімами за allowlist, віддачею stale під час аварій і диском з LRU-обмеженням під артефакти реєстрів.
   version: 0.10.1
   released: "2026-10-11"
+  modified: "2026-10-16"
 includes:
   - .makefile/b19/ci.yaml
   - .makefile/b19/traits/image/attested.yaml
   - .makefile/b19/traits/image/signed.yaml
   - .makefile/b19/traits/image/torrent.yaml
-  - .makefile/container/traits/image/malware-scan.yaml
   - .makefile/container/traits/audit/nginx.yaml
+  - .makefile/container/traits/image/malware-scan.yaml
   - .makefile/container/traits/readme/service.yaml
   - .makefile/library/images/nginx.yaml
   - .projectfile/vulnerabilities.yaml
@@ -32,26 +33,18 @@ includes:
   - https://kiota.ch/damian-buho/metadata/raw/branch/main/registry/dockerhub.yaml
   - https://kiota.ch/r8e/metadata/raw/branch/main/include.yaml
 keywords:
-  - nginx
+  - build-cache
+  - forward-proxy
   - http-cache
-  - proxy
-  - cache
+  - nginx
   - reverse-proxy
-  - docker
+  - self-hosted
 kind: SoftwareSourceCode
 links:
   - label:
-      en: R8E / HTTP Cache on kiota.ch
-      es: R8E / HTTP Cache en kiota.ch
-      uk: R8E / HTTP Cache на kiota.ch
-    preferred: true
-    priority: 10
-    type: source-code
-    url: https://kiota.ch/r8e/http-cache
-  - label:
-      en: R8E / HTTP Cache on GitHub
-      es: R8E / HTTP Cache en GitHub
-      uk: R8E / HTTP Cache на GitHub
+      en: Repository on GitHub
+      es: Repositorio en GitHub
+      uk: Репозиторій на GitHub
     priority: 80
     tags:
       - public
@@ -66,20 +59,29 @@ links:
     priority: 80
     tags:
       - support
+      - readme
     type: bugs
     url: https://github.com/damian-buho/r8e-http-cache/issues
   - label:
-      en: Packages on Docker Hub
-      es: Paquetes en Docker Hub
-      uk: Пакунки на Docker Hub
-    type: package-registry
-    url: https://hub.docker.com/r/damianbuho/r8e-http-cache
+      en: Repository on kiota.ch
+      es: Repositorio en kiota.ch
+      uk: Репозиторій на kiota.ch
+    preferred: true
+    priority: 10
+    type: source-code
+    url: https://kiota.ch/r8e/http-cache
   - label:
       en: Packages on GHCR
       es: Paquetes en GHCR
       uk: Пакунки на GHCR
     type: package-registry
     url: https://github.com/damian-buho/r8e-http-cache/pkgs/container/r8e%2Fhttp-cache
+  - label:
+      en: Packages on Docker Hub
+      es: Paquetes en Docker Hub
+      uk: Пакунки на Docker Hub
+    type: package-registry
+    url: https://hub.docker.com/r/damianbuho/r8e-http-cache
 org:
   projectfile:
     artifacts:

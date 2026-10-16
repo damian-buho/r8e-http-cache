@@ -10,7 +10,7 @@ pf-cli-managed: yes
 
 # R8E / HTTP Cache
 
-Дистрибуція Nginx з підтримкою спільноти, зібрана на основі B19/Ubuntu. Цей репозиторій містить лише пакування — Dockerfile, скрипти збирання та конфігурацію, усе під ліцензією MIT; вихідний код Nginx отримують під час збирання, і він зберігає власну ліцензію.
+HTTPS-кешувальний проксі з апстрімами за allowlist, віддачею stale під час аварій і диском з LRU-обмеженням під артефакти реєстрів.
 
 [![Stand with Ukraine](https://raw.githubusercontent.com/vshymanskyy/StandWithUkraine/main/badges/StandWithUkraine.svg)](https://damian-buho.github.io/support-ukraine/) [![Projectfile inside](https://badges.kiota.ch/static/v1?label=projectfile&message=inside&labelColor=0d0d0d&color=8c6723&style=flat-square)](https://projectfile.org) [![License](https://badges.kiota.ch/static/v1?label=license&message=MIT&color=1e5913&style=flat-square)](LICENSE) [![Cosign](https://badges.kiota.ch/static/v1?label=cosign&message=enabled&color=1e5913&style=flat-square)](https://docs.sigstore.dev/cosign/verifying/verify/) ![ClamAV scanned](https://badges.kiota.ch/static/v1?label=clamav&message=scanned&color=1877aa&style=flat-square) [![PRs welcome](https://badges.kiota.ch/static/v1?label=PRs&message=welcome&color=1e5913&style=flat-square)](CONTRIBUTING.md) [![REUSE compliance](https://api.reuse.software/badge/github.com/damian-buho/r8e-http-cache)](https://api.reuse.software/info/github.com/damian-buho/r8e-http-cache)
 
@@ -136,6 +136,7 @@ make container-build
 
 ## Посилання
 
+- [Задачі на GitHub](https://github.com/damian-buho/r8e-http-cache/issues)
 - [Специфікація Projectfile](https://projectfile.org)
 
 ## Ліцензія
