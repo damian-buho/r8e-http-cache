@@ -101,7 +101,7 @@ org:
       - arm64
     ci:
       nodes:
-        container-ready-to-test:
+        container-is-tested:
           needs:
             gixy-checked: true
     conventions:
