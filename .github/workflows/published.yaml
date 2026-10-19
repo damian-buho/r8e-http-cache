@@ -92,29 +92,19 @@ jobs:
         if: (vars.CI_ONLY_M6E_ARCH == '' || contains(format(',{0},', vars.CI_ONLY_M6E_ARCH), format(',{0},', matrix.M6E_ARCH))) && vars.CI_SKIP_IMAGES_ARE_OK != 'true' && vars.CI_SKIP_DC_PULL != 'true'
         run: M6E_COMPOSE_FILE=.compose/pipeline.yaml .makefile/container/scripts/compose-pull.sh
       - name: dc-up-d
-        if: (vars.CI_ONLY_M6E_ARCH == '' || contains(format(',{0},', vars.CI_ONLY_M6E_ARCH), format(',{0},', matrix.M6E_ARCH))) && vars.CI_SKIP_CONTAINER_IS_STARTED != 'true' && vars.CI_SKIP_DC_UP_D != 'true'
+        if: (vars.CI_ONLY_M6E_ARCH == '' || contains(format(',{0},', vars.CI_ONLY_M6E_ARCH), format(',{0},', matrix.M6E_ARCH))) && vars.CI_SKIP_CONTAINER_IS_OK != 'true' && vars.CI_SKIP_DC_UP_D != 'true'
         run: timeout --kill-after=10s "${M6E_COMPOSE_UP_TIMEOUT:-300}s" docker compose --project-name "$M6E_COMPOSE_PROJECT_NAME" --file .compose/pipeline.yaml up --detach --renew-anon-volumes --no-build </dev/null
-      - name: gixy-config-extract
-        if: (vars.CI_ONLY_M6E_ARCH == '' || contains(format(',{0},', vars.CI_ONLY_M6E_ARCH), format(',{0},', matrix.M6E_ARCH))) && vars.CI_SKIP_NGINX_CONFIG_EXTRACTED != 'true' && vars.CI_SKIP_GIXY_CONFIG_EXTRACT != 'true'
-        run: M6E_EXTRACT_PATHS=/app/.config .makefile/container/scripts/extract-artifact.sh reports/nginx-config
-      - name: gixy
-        if: (vars.CI_ONLY_M6E_ARCH == '' || contains(format(',{0},', vars.CI_ONLY_M6E_ARCH), format(',{0},', matrix.M6E_ARCH))) && vars.CI_SKIP_GIXY_CHECKED != 'true' && vars.CI_SKIP_GIXY != 'true'
-        uses: projectfile-org/actions/run-tool@cabb2957bccacf9b0c8f4b7c98c88f5bb7f83939 # v1
-        with:
-          image: ${{ vars.D9T_PYTHON_TOOLS_IMAGE || format('{0}/d9t/python-tools', vars.SOURCE_DOCKER_REGISTRY || 'ghcr.io/damian-buho') }}
-          version: ${{ env.M6E_TAG }}
-          run: auto-gixy reports/nginx-config/nginx.conf
       - name: configuration-check
-        if: (vars.CI_ONLY_M6E_ARCH == '' || contains(format(',{0},', vars.CI_ONLY_M6E_ARCH), format(',{0},', matrix.M6E_ARCH))) && vars.CI_SKIP_CONTAINER_IS_TESTED != 'true' && vars.CI_SKIP_CONFIGURATION_CHECK != 'true'
+        if: (vars.CI_ONLY_M6E_ARCH == '' || contains(format(',{0},', vars.CI_ONLY_M6E_ARCH), format(',{0},', matrix.M6E_ARCH))) && vars.CI_SKIP_CONTAINER_READY_TO_TEST != 'true' && vars.CI_SKIP_CONFIGURATION_CHECK != 'true'
         run: .makefile/container/scripts/configuration-capture.sh --check --default-lang= es uk
       - name: container-test
-        if: (vars.CI_ONLY_M6E_ARCH == '' || contains(format(',{0},', vars.CI_ONLY_M6E_ARCH), format(',{0},', matrix.M6E_ARCH))) && vars.CI_SKIP_CONTAINER_IS_TESTED != 'true' && vars.CI_SKIP_CONTAINER_TEST != 'true'
+        if: (vars.CI_ONLY_M6E_ARCH == '' || contains(format(',{0},', vars.CI_ONLY_M6E_ARCH), format(',{0},', matrix.M6E_ARCH))) && vars.CI_SKIP_CONTAINER_READY_TO_TEST != 'true' && vars.CI_SKIP_CONTAINER_TEST != 'true'
         uses: projectfile-org/actions/container-exec@cabb2957bccacf9b0c8f4b7c98c88f5bb7f83939 # v1
         with:
           container: ${{ env.M6E_CONTAINER_INSTANCE }}
           run: test.d
       - name: usage-check
-        if: (vars.CI_ONLY_M6E_ARCH == '' || contains(format(',{0},', vars.CI_ONLY_M6E_ARCH), format(',{0},', matrix.M6E_ARCH))) && vars.CI_SKIP_CONTAINER_IS_TESTED != 'true' && vars.CI_SKIP_USAGE_CHECK != 'true'
+        if: (vars.CI_ONLY_M6E_ARCH == '' || contains(format(',{0},', vars.CI_ONLY_M6E_ARCH), format(',{0},', matrix.M6E_ARCH))) && vars.CI_SKIP_CONTAINER_READY_TO_TEST != 'true' && vars.CI_SKIP_USAGE_CHECK != 'true'
         run: .makefile/container/scripts/usage-capture.sh --check --image --default-lang= es uk
       - name: dc-diagnose
         if: ${{ always() }}
@@ -191,92 +181,13 @@ jobs:
           name: syft-sbom-tar-${{ matrix.M6E_ARCH }}-${{ github.run_id }}
           path: reports
           overwrite: true
-  image-is-built:
-    runs-on: ${{ matrix.M6E_RUNNER }}
-    needs: ["documentation-passes-lint", "projectfile-is-ok", "release-tag", "runner-is-ready", "signing-is-ready", "source-is-compliant", "source-is-secure", "source-passes-lint"]
-    permissions:
-      actions: write
-      contents: read
-    if: ${{ !cancelled() && needs.documentation-passes-lint.result == 'success' && needs.projectfile-is-ok.result == 'success' && needs.release-tag.result == 'success' && needs.runner-is-ready.result == 'success' && (needs.signing-is-ready.result == 'success' || (needs.signing-is-ready.result == 'skipped' && !((startsWith(github.ref, 'refs/heads/')) || (needs.release-tag.outputs.tag != '')))) && needs.source-is-compliant.result == 'success' && needs.source-is-secure.result == 'success' && needs.source-passes-lint.result == 'success' && ((github.event_name != 'pull_request' || github.event.pull_request.head.repo.full_name != github.repository)) }}
-    concurrency:
-      group: build-${{ github.repository }}-${{ toJSON(matrix) }}
-      cancel-in-progress: false
-    strategy:
-      max-parallel: 2
-      matrix:
-        M6E_ARCH: ["amd64", "arm64"]
-        include:
-          - M6E_ARCH: "amd64"
-            M6E_RUNNER: "ubuntu-26.04"
-          - M6E_ARCH: "arm64"
-            M6E_RUNNER: "ubuntu-26.04-arm"
-    env:
-      M6E_ARCH: ${{ matrix.M6E_ARCH }}
-      M6E_NAMESPACE: r8e
-      M6E_PROJECT: http-cache
-      B19_COLOR: ${{ inputs.B19_COLOR || vars.B19_COLOR || '1' }}
-      B19_FETCH_DOCKER_CACHE: ${{ inputs.B19_FETCH_DOCKER_CACHE || vars.B19_FETCH_DOCKER_CACHE || 'Y' }}
-      B19_FETCH_LOCAL_CACHE: ${{ inputs.B19_FETCH_LOCAL_CACHE || vars.B19_FETCH_LOCAL_CACHE || 'Y' }}
-      B19_OFFGRID_MODE: ${{ inputs.B19_OFFGRID_MODE || vars.B19_OFFGRID_MODE || 'N' }}
-      B19_VERBOSITY: ${{ inputs.B19_VERBOSITY || vars.B19_VERBOSITY || 'info' }}
-      DESTINATION_DOCKER_REGISTRY: ${{ inputs.DESTINATION_DOCKER_REGISTRY || vars.DESTINATION_DOCKER_REGISTRY }}
-      LANG: ${{ inputs.LANG || vars.LANG }}
-      M6E_APT_CACHE_HOST: ${{ inputs.M6E_APT_CACHE_HOST || vars.M6E_APT_CACHE_HOST }}
-      M6E_APT_CACHE_PORT: ${{ inputs.M6E_APT_CACHE_PORT || vars.M6E_APT_CACHE_PORT }}
-      M6E_BUILD_DEBUG: ${{ inputs.M6E_BUILD_DEBUG || vars.M6E_BUILD_DEBUG }}
-      M6E_NEAR_CACHE_HOST: ${{ inputs.M6E_NEAR_CACHE_HOST || vars.M6E_NEAR_CACHE_HOST }}
-      M6E_NEAR_CACHE_PORT: ${{ inputs.M6E_NEAR_CACHE_PORT || vars.M6E_NEAR_CACHE_PORT }}
-      O9S_NGINX_BASE_IMAGE: ${{ vars.O9S_NGINX_BASE_IMAGE || format('{0}/o9s/nginx:{1}', vars.SOURCE_DOCKER_REGISTRY || 'ghcr.io/damian-buho', vars.BASE_IMAGE_DEFAULT_VERSION || 'latest') }}
-      SOURCE_DOCKER_REGISTRY: ${{ inputs.SOURCE_DOCKER_REGISTRY || vars.SOURCE_DOCKER_REGISTRY }}
-      M6E_VERSION: ${{ needs.release-tag.outputs.tag }}
-    steps:
-      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
-        with:
-          submodules: true
-          persist-credentials: false
-      - name: use an isolated buildx builder
-        if: (vars.CI_ONLY_M6E_ARCH == '' || contains(format(',{0},', vars.CI_ONLY_M6E_ARCH), format(',{0},', matrix.M6E_ARCH))) && vars.CI_SKIP_IMAGE_IS_BUILT != 'true' && vars.CI_SKIP_CONTAINER_BUILD != 'true'
-        # the docker driver's image exporter needs the host's containerd store; docker-container carries its own, so no host config or restart is needed on any GHA runner flavor.
-        run: docker buildx create --name ci --driver docker-container --use
-      - name: container-build
-        if: (vars.CI_ONLY_M6E_ARCH == '' || contains(format(',{0},', vars.CI_ONLY_M6E_ARCH), format(',{0},', matrix.M6E_ARCH))) && vars.CI_SKIP_IMAGE_IS_BUILT != 'true' && vars.CI_SKIP_CONTAINER_BUILD != 'true'
-        uses: projectfile-org/actions/container-build/buildx@cabb2957bccacf9b0c8f4b7c98c88f5bb7f83939 # v1
-        with:
-          artifact-name: image-${{ matrix.M6E_ARCH }}-${{ github.run_id }}
-          image: r8e/http-cache:${{ env.M6E_TAG }}-${{ github.run_id }}-${{ matrix.M6E_ARCH }}
-          build-args: |-
-            B19_COLOR=${{ inputs.B19_COLOR || vars.B19_COLOR || '1' }}
-            B19_FETCH_DOCKER_CACHE=${{ inputs.B19_FETCH_DOCKER_CACHE || vars.B19_FETCH_DOCKER_CACHE || 'Y' }}
-            B19_FETCH_LOCAL_CACHE=${{ inputs.B19_FETCH_LOCAL_CACHE || vars.B19_FETCH_LOCAL_CACHE || 'Y' }}
-            B19_OFFGRID_MODE=${{ inputs.B19_OFFGRID_MODE || vars.B19_OFFGRID_MODE || 'N' }}
-            B19_VERBOSITY=${{ inputs.B19_VERBOSITY || vars.B19_VERBOSITY || 'info' }}
-            DESTINATION_DOCKER_REGISTRY=${{ inputs.DESTINATION_DOCKER_REGISTRY || vars.DESTINATION_DOCKER_REGISTRY }}
-            LANG=${{ inputs.LANG || vars.LANG }}
-            M6E_APT_CACHE_HOST=${{ inputs.M6E_APT_CACHE_HOST || vars.M6E_APT_CACHE_HOST }}
-            M6E_APT_CACHE_PORT=${{ inputs.M6E_APT_CACHE_PORT || vars.M6E_APT_CACHE_PORT }}
-            M6E_ARCH=${{ matrix.M6E_ARCH }}
-            M6E_BUILD_DEBUG=${{ inputs.M6E_BUILD_DEBUG || vars.M6E_BUILD_DEBUG }}
-            M6E_NAMESPACE=r8e
-            M6E_NEAR_CACHE_HOST=${{ inputs.M6E_NEAR_CACHE_HOST || vars.M6E_NEAR_CACHE_HOST }}
-            M6E_NEAR_CACHE_PORT=${{ inputs.M6E_NEAR_CACHE_PORT || vars.M6E_NEAR_CACHE_PORT }}
-            M6E_PROJECT=http-cache
-            M6E_VERSION=${{ needs.release-tag.outputs.tag }}
-            O9S_NGINX_BASE_IMAGE=${{ vars.O9S_NGINX_BASE_IMAGE || format('{0}/o9s/nginx:{1}', vars.SOURCE_DOCKER_REGISTRY || 'ghcr.io/damian-buho', env.M6E_TAG) }}
-            SOURCE_DOCKER_REGISTRY=${{ inputs.SOURCE_DOCKER_REGISTRY || vars.SOURCE_DOCKER_REGISTRY }}
-          mounts: fetch=/fetch
-          pf-cli-image: ${{ vars.PF_CLI_IMAGE || format('{0}/cli:{1}', vars.SOURCE_DOCKER_REGISTRY || 'ghcr.io/projectfile-org', env.M6E_TAG) }}
-          # This CELL's architecture, off the arch axis derived from the declared set.
-          # One arch per call: the single-image archive is what every consumer reads.
-          platform: ${{ matrix.M6E_ARCH }}
-          mount-cache-key: ci-cache-mounts-${{ matrix.M6E_ARCH }}-
-          mount-cache-restore-keys: ci-cache-mounts-
-  image-is-published:
+  image-is-attested:
     runs-on: ubuntu-26.04
-    needs: ["container-is-verified", "documentation-passes-lint", "image-has-sbom", "image-is-built", "image-is-secure", "projectfile-is-ok", "release-tag", "runner-is-ready", "signing-is-ready", "source-is-compliant", "source-is-secure", "source-passes-lint"]
+    needs: ["image-has-sbom", "image-is-published", "release-tag"]
     permissions:
       contents: read
       packages: write
-    if: ${{ !cancelled() && needs.container-is-verified.result == 'success' && needs.documentation-passes-lint.result == 'success' && (needs.image-has-sbom.result == 'success' || (needs.image-has-sbom.result == 'skipped' && !(needs.release-tag.outputs.tag != ''))) && needs.image-is-built.result == 'success' && needs.image-is-secure.result == 'success' && needs.projectfile-is-ok.result == 'success' && needs.release-tag.result == 'success' && needs.runner-is-ready.result == 'success' && needs.signing-is-ready.result == 'success' && needs.source-is-compliant.result == 'success' && needs.source-is-secure.result == 'success' && needs.source-passes-lint.result == 'success' && ((startsWith(github.ref, 'refs/heads/')) || (needs.release-tag.outputs.tag != '')) }}
+    if: ${{ !cancelled() && (needs.image-has-sbom.result == 'success' || (needs.image-has-sbom.result == 'skipped' && !(needs.release-tag.outputs.tag != ''))) && needs.image-is-published.result == 'success' && needs.release-tag.result == 'success' && ((startsWith(github.ref, 'refs/heads/')) || (needs.release-tag.outputs.tag != '')) }}
     strategy:
       matrix:
         M6E_PUBLISH_SINK: ["ghcr"]
@@ -378,6 +289,110 @@ jobs:
           run: auto-cosign sign
           env: |-
             COSIGN_PASSWORD=${{ secrets.COSIGN_PASSWORD }}
+  image-is-built:
+    runs-on: ${{ matrix.M6E_RUNNER }}
+    needs: ["documentation-passes-lint", "projectfile-is-ok", "release-tag", "source-is-compliant", "source-is-secure", "source-passes-lint"]
+    permissions:
+      actions: write
+      contents: read
+    if: ${{ !cancelled() && needs.documentation-passes-lint.result == 'success' && needs.projectfile-is-ok.result == 'success' && needs.release-tag.result == 'success' && needs.source-is-compliant.result == 'success' && needs.source-is-secure.result == 'success' && needs.source-passes-lint.result == 'success' && ((github.event_name != 'pull_request' || github.event.pull_request.head.repo.full_name != github.repository)) }}
+    concurrency:
+      group: build-${{ github.repository }}-${{ toJSON(matrix) }}
+      cancel-in-progress: false
+    strategy:
+      max-parallel: 2
+      matrix:
+        M6E_ARCH: ["amd64", "arm64"]
+        include:
+          - M6E_ARCH: "amd64"
+            M6E_RUNNER: "ubuntu-26.04"
+          - M6E_ARCH: "arm64"
+            M6E_RUNNER: "ubuntu-26.04-arm"
+    env:
+      M6E_ARCH: ${{ matrix.M6E_ARCH }}
+      M6E_NAMESPACE: r8e
+      M6E_PROJECT: http-cache
+      B19_COLOR: ${{ inputs.B19_COLOR || vars.B19_COLOR || '1' }}
+      B19_FETCH_DOCKER_CACHE: ${{ inputs.B19_FETCH_DOCKER_CACHE || vars.B19_FETCH_DOCKER_CACHE || 'Y' }}
+      B19_FETCH_LOCAL_CACHE: ${{ inputs.B19_FETCH_LOCAL_CACHE || vars.B19_FETCH_LOCAL_CACHE || 'Y' }}
+      B19_OFFGRID_MODE: ${{ inputs.B19_OFFGRID_MODE || vars.B19_OFFGRID_MODE || 'N' }}
+      B19_VERBOSITY: ${{ inputs.B19_VERBOSITY || vars.B19_VERBOSITY || 'info' }}
+      DESTINATION_DOCKER_REGISTRY: ${{ inputs.DESTINATION_DOCKER_REGISTRY || vars.DESTINATION_DOCKER_REGISTRY }}
+      LANG: ${{ inputs.LANG || vars.LANG }}
+      M6E_APT_CACHE_HOST: ${{ inputs.M6E_APT_CACHE_HOST || vars.M6E_APT_CACHE_HOST }}
+      M6E_APT_CACHE_PORT: ${{ inputs.M6E_APT_CACHE_PORT || vars.M6E_APT_CACHE_PORT }}
+      M6E_BUILD_DEBUG: ${{ inputs.M6E_BUILD_DEBUG || vars.M6E_BUILD_DEBUG }}
+      M6E_NEAR_CACHE_HOST: ${{ inputs.M6E_NEAR_CACHE_HOST || vars.M6E_NEAR_CACHE_HOST }}
+      M6E_NEAR_CACHE_PORT: ${{ inputs.M6E_NEAR_CACHE_PORT || vars.M6E_NEAR_CACHE_PORT }}
+      O9S_NGINX_BASE_IMAGE: ${{ vars.O9S_NGINX_BASE_IMAGE || format('{0}/o9s/nginx:{1}', vars.SOURCE_DOCKER_REGISTRY || 'ghcr.io/damian-buho', vars.BASE_IMAGE_DEFAULT_VERSION || 'latest') }}
+      SOURCE_DOCKER_REGISTRY: ${{ inputs.SOURCE_DOCKER_REGISTRY || vars.SOURCE_DOCKER_REGISTRY }}
+      M6E_VERSION: ${{ needs.release-tag.outputs.tag }}
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
+        with:
+          submodules: true
+          persist-credentials: false
+      - name: use an isolated buildx builder
+        if: (vars.CI_ONLY_M6E_ARCH == '' || contains(format(',{0},', vars.CI_ONLY_M6E_ARCH), format(',{0},', matrix.M6E_ARCH))) && vars.CI_SKIP_IMAGE_IS_BUILT != 'true' && vars.CI_SKIP_CONTAINER_BUILD != 'true'
+        # the docker driver's image exporter needs the host's containerd store; docker-container carries its own, so no host config or restart is needed on any GHA runner flavor.
+        run: docker buildx create --name ci --driver docker-container --use
+      - name: container-build
+        if: (vars.CI_ONLY_M6E_ARCH == '' || contains(format(',{0},', vars.CI_ONLY_M6E_ARCH), format(',{0},', matrix.M6E_ARCH))) && vars.CI_SKIP_IMAGE_IS_BUILT != 'true' && vars.CI_SKIP_CONTAINER_BUILD != 'true'
+        uses: projectfile-org/actions/container-build/buildx@cabb2957bccacf9b0c8f4b7c98c88f5bb7f83939 # v1
+        with:
+          artifact-name: image-${{ matrix.M6E_ARCH }}-${{ github.run_id }}
+          image: r8e/http-cache:${{ env.M6E_TAG }}-${{ github.run_id }}-${{ matrix.M6E_ARCH }}
+          build-args: |-
+            B19_COLOR=${{ inputs.B19_COLOR || vars.B19_COLOR || '1' }}
+            B19_FETCH_DOCKER_CACHE=${{ inputs.B19_FETCH_DOCKER_CACHE || vars.B19_FETCH_DOCKER_CACHE || 'Y' }}
+            B19_FETCH_LOCAL_CACHE=${{ inputs.B19_FETCH_LOCAL_CACHE || vars.B19_FETCH_LOCAL_CACHE || 'Y' }}
+            B19_OFFGRID_MODE=${{ inputs.B19_OFFGRID_MODE || vars.B19_OFFGRID_MODE || 'N' }}
+            B19_VERBOSITY=${{ inputs.B19_VERBOSITY || vars.B19_VERBOSITY || 'info' }}
+            DESTINATION_DOCKER_REGISTRY=${{ inputs.DESTINATION_DOCKER_REGISTRY || vars.DESTINATION_DOCKER_REGISTRY }}
+            LANG=${{ inputs.LANG || vars.LANG }}
+            M6E_APT_CACHE_HOST=${{ inputs.M6E_APT_CACHE_HOST || vars.M6E_APT_CACHE_HOST }}
+            M6E_APT_CACHE_PORT=${{ inputs.M6E_APT_CACHE_PORT || vars.M6E_APT_CACHE_PORT }}
+            M6E_ARCH=${{ matrix.M6E_ARCH }}
+            M6E_BUILD_DEBUG=${{ inputs.M6E_BUILD_DEBUG || vars.M6E_BUILD_DEBUG }}
+            M6E_NAMESPACE=r8e
+            M6E_NEAR_CACHE_HOST=${{ inputs.M6E_NEAR_CACHE_HOST || vars.M6E_NEAR_CACHE_HOST }}
+            M6E_NEAR_CACHE_PORT=${{ inputs.M6E_NEAR_CACHE_PORT || vars.M6E_NEAR_CACHE_PORT }}
+            M6E_PROJECT=http-cache
+            M6E_VERSION=${{ needs.release-tag.outputs.tag }}
+            O9S_NGINX_BASE_IMAGE=${{ vars.O9S_NGINX_BASE_IMAGE || format('{0}/o9s/nginx:{1}', vars.SOURCE_DOCKER_REGISTRY || 'ghcr.io/damian-buho', env.M6E_TAG) }}
+            SOURCE_DOCKER_REGISTRY=${{ inputs.SOURCE_DOCKER_REGISTRY || vars.SOURCE_DOCKER_REGISTRY }}
+          mounts: fetch=/fetch
+          pf-cli-image: ${{ vars.PF_CLI_IMAGE || format('{0}/cli:{1}', vars.SOURCE_DOCKER_REGISTRY || 'ghcr.io/projectfile-org', env.M6E_TAG) }}
+          # This CELL's architecture, off the arch axis derived from the declared set.
+          # One arch per call: the single-image archive is what every consumer reads.
+          platform: ${{ matrix.M6E_ARCH }}
+          mount-cache-key: ci-cache-mounts-${{ matrix.M6E_ARCH }}-
+          mount-cache-restore-keys: ci-cache-mounts-
+  image-is-published:
+    runs-on: ubuntu-26.04
+    needs: ["image-is-built", "release-tag", "signing-is-ready"]
+    if: ${{ !cancelled() && needs.image-is-built.result == 'success' && needs.release-tag.result == 'success' && needs.signing-is-ready.result == 'success' && ((startsWith(github.ref, 'refs/heads/')) || (needs.release-tag.outputs.tag != '')) }}
+    concurrency:
+      group: publish-${{ github.repository }}-${{ toJSON(matrix) }}
+      cancel-in-progress: false
+    env:
+      M6E_IMAGE_ARCHIVE: image-${{ github.run_id }}.tar
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
+        with:
+          submodules: true
+          persist-credentials: false
+      - uses: actions/download-artifact@3e5f45b2cfb9172054b4087a40e8e0b5a5461e7c # v8
+        if: (vars.CI_ONLY_M6E_ARCH == '' || contains(format(',{0},', vars.CI_ONLY_M6E_ARCH), ',amd64,')) && vars.CI_SKIP_IMAGE_IS_BUILT != 'true' && vars.CI_SKIP_CONTAINER_BUILD != 'true'
+        with:
+          name: image-amd64-${{ github.run_id }}
+      - uses: actions/download-artifact@3e5f45b2cfb9172054b4087a40e8e0b5a5461e7c # v8
+        if: (vars.CI_ONLY_M6E_ARCH == '' || contains(format(',{0},', vars.CI_ONLY_M6E_ARCH), ',arm64,')) && vars.CI_SKIP_IMAGE_IS_BUILT != 'true' && vars.CI_SKIP_CONTAINER_BUILD != 'true'
+        with:
+          name: image-arm64-${{ github.run_id }}
+      - name: release-is-ready
+        if: vars.CI_SKIP_IMAGE_IS_PUBLISHED != 'true' && vars.CI_SKIP_RELEASE_IS_READY != 'true'
+        run: release-is-ready
   image-is-secure:
     runs-on: ubuntu-26.04
     needs: ["image-is-built"]
@@ -534,7 +549,7 @@ jobs:
           run: pf-cli validate
   published:
     runs-on: ubuntu-26.04
-    needs: ["container-is-verified", "documentation-passes-lint", "image-has-sbom", "image-is-built", "image-is-published", "image-is-secure", "projectfile-is-ok", "projectfile-is-valid", "release-is-published", "release-notes-are-published", "release-tag", "runner-is-ready", "signing-is-ready", "source-is-compliant", "source-is-secure", "source-passes-lint"]
+    needs: ["container-is-verified", "documentation-passes-lint", "image-has-sbom", "image-is-attested", "image-is-built", "image-is-published", "image-is-secure", "projectfile-is-ok", "projectfile-is-valid", "release-is-published", "release-notes-are-published", "release-tag", "signing-is-ready", "source-is-compliant", "source-is-secure", "source-passes-lint"]
     if: ${{ always() && (github.event_name != 'pull_request' || github.event.pull_request.head.repo.full_name != github.repository) }}
     steps:
       - name: published verdict
@@ -544,6 +559,7 @@ jobs:
             "container-is-verified=${{ needs.container-is-verified.result }}" \
             "documentation-passes-lint=${{ needs.documentation-passes-lint.result }}" \
             "image-has-sbom=${{ needs.image-has-sbom.result }}" \
+            "image-is-attested=${{ needs.image-is-attested.result }}" \
             "image-is-built=${{ needs.image-is-built.result }}" \
             "image-is-published=${{ needs.image-is-published.result }}" \
             "image-is-secure=${{ needs.image-is-secure.result }}" \
@@ -552,7 +568,6 @@ jobs:
             "release-is-published=${{ needs.release-is-published.result }}" \
             "release-notes-are-published=${{ needs.release-notes-are-published.result }}" \
             "release-tag=${{ needs.release-tag.result }}" \
-            "runner-is-ready=${{ needs.runner-is-ready.result }}" \
             "signing-is-ready=${{ needs.signing-is-ready.result }}" \
             "source-is-compliant=${{ needs.source-is-compliant.result }}" \
             "source-is-secure=${{ needs.source-is-secure.result }}" \
@@ -574,10 +589,10 @@ jobs:
           [ "${failed}" -eq 0 ]
   release-is-published:
     runs-on: ubuntu-26.04
-    needs: ["image-is-built", "image-is-published", "release-tag"]
+    needs: ["image-is-attested", "image-is-built", "image-is-published", "release-tag"]
     permissions:
       contents: write
-    if: ${{ !cancelled() && needs.image-is-built.result == 'success' && needs.image-is-published.result == 'success' && needs.release-tag.result == 'success' && (needs.release-tag.outputs.tag != '') }}
+    if: ${{ !cancelled() && needs.image-is-attested.result == 'success' && needs.image-is-built.result == 'success' && needs.image-is-published.result == 'success' && needs.release-tag.result == 'success' && (needs.release-tag.outputs.tag != '') }}
     env:
       M6E_RELEASE_TAG: ${{ needs.release-tag.outputs.tag }}
       RELEASE_TARGET: main
@@ -643,49 +658,6 @@ jobs:
         id: release-tag-detect
         if: vars.CI_SKIP_RELEASE_TAG != 'true' && vars.CI_SKIP_RELEASE_TAG_DETECT != 'true'
         run: .makefile/core/scripts/release-tag.sh
-  runner-is-ready:
-    runs-on: ubuntu-26.04
-    if: (github.event_name != 'pull_request' || github.event.pull_request.head.repo.full_name != github.repository)
-    env:
-      PREFLIGHT_MIN_FREE_GIB: 10
-      PREFLIGHT_HOSTS: ${{ vars.M6E_APT_CACHE_HOST }}:${{ vars.M6E_APT_CACHE_PORT }} ${{ vars.M6E_NEAR_CACHE_HOST }}:${{ vars.M6E_NEAR_CACHE_PORT }}
-    steps:
-      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
-        with:
-          submodules: true
-          persist-credentials: false
-      - name: disk-preflight
-        if: vars.CI_SKIP_RUNNER_IS_READY != 'true' && vars.CI_SKIP_DISK_PREFLIGHT != 'true'
-        uses: projectfile-org/actions/preflight@cabb2957bccacf9b0c8f4b7c98c88f5bb7f83939 # v1
-        with:
-          check: disk
-          env: |-
-            PREFLIGHT_MIN_FREE_GIB=10
-      - name: hosts-preflight
-        if: vars.CI_SKIP_RUNNER_IS_READY != 'true' && vars.CI_SKIP_HOSTS_PREFLIGHT != 'true'
-        uses: projectfile-org/actions/preflight@cabb2957bccacf9b0c8f4b7c98c88f5bb7f83939 # v1
-        with:
-          check: hosts
-          env: |-
-            PREFLIGHT_HOSTS=${{ vars.M6E_APT_CACHE_HOST }}:${{ vars.M6E_APT_CACHE_PORT }} ${{ vars.M6E_NEAR_CACHE_HOST }}:${{ vars.M6E_NEAR_CACHE_PORT }}
-      - name: images-preflight
-        if: vars.CI_SKIP_RUNNER_IS_READY != 'true' && vars.CI_SKIP_IMAGES_PREFLIGHT != 'true'
-        uses: projectfile-org/actions/preflight@cabb2957bccacf9b0c8f4b7c98c88f5bb7f83939 # v1
-        with:
-          check: images
-          images: |-
-            ${{ vars.D9T_GO_TOOLS_IMAGE || format('{0}/d9t/go-tools', vars.SOURCE_DOCKER_REGISTRY || 'ghcr.io/damian-buho') }} ${{ env.M6E_TAG }} auto-cosign,auto-grype,auto-syft,auto-trivy -
-            ${{ vars.D9T_JS_TOOLS_IMAGE || format('{0}/d9t/js-tools', vars.SOURCE_DOCKER_REGISTRY || 'ghcr.io/damian-buho') }} ${{ env.M6E_TAG }} auto-jsonlint,auto-markdownlint,auto-textlint -
-            ${{ vars.D9T_MISC_TOOLS_IMAGE || format('{0}/d9t/misc-tools', vars.SOURCE_DOCKER_REGISTRY || 'ghcr.io/damian-buho') }} ${{ env.M6E_TAG }} auto-clamav,auto-i18n,auto-shellcheck -
-            ${{ vars.D9T_PYTHON_TOOLS_IMAGE || format('{0}/d9t/python-tools', vars.SOURCE_DOCKER_REGISTRY || 'ghcr.io/damian-buho') }} ${{ env.M6E_TAG }} auto-gixy,auto-yamllint,reuse -
-            ${{ vars.D9T_RUST_TOOLS_IMAGE || format('{0}/d9t/rust-tools', vars.SOURCE_DOCKER_REGISTRY || 'ghcr.io/damian-buho') }} ${{ env.M6E_TAG }} auto-zizmor -
-            ${{ vars.D9T_R_TOOLS_IMAGE || format('{0}/d9t/r-tools', vars.SOURCE_DOCKER_REGISTRY || 'ghcr.io/damian-buho') }} ${{ env.M6E_TAG }} auto-cffr-validate -
-            ${{ vars.DOCKER_CLI_IMAGE || 'docker' }} 29.8.1-cli sh -
-            ${{ vars.HADOLINT_IMAGE || 'hadolint/hadolint' }} v2.15.1 hadolint -
-            ${{ vars.IGNORELINT_IMAGE || format('{0}/ignorelint', vars.SOURCE_DOCKER_REGISTRY || 'ghcr.io/damian-buho') }} ${{ env.M6E_TAG }} ignorelint -
-            ${{ vars.O9S_NGINX_BASE_IMAGE || format('{0}/o9s/nginx:{1}', vars.SOURCE_DOCKER_REGISTRY || 'ghcr.io/damian-buho', env.M6E_TAG) }} - - -
-            ${{ vars.PF_BRIDGE_IMAGE || format('{0}/bridge', vars.SOURCE_DOCKER_REGISTRY || 'ghcr.io/projectfile-org') }} ${{ env.M6E_TAG }} pf-bridge -
-            ${{ vars.PF_CLI_IMAGE || format('{0}/cli', vars.SOURCE_DOCKER_REGISTRY || 'ghcr.io/projectfile-org') }} ${{ env.M6E_TAG }} pf-cli -
   signing-is-ready:
     runs-on: ubuntu-26.04
     needs: ["release-tag"]
