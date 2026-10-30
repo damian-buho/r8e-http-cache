@@ -15,8 +15,8 @@ identity:
     en: HTTPS caching proxy with allowlisted upstreams, stale serving during outages, and LRU-bounded disk sized for registry artifacts.
     es: Proxy de caché HTTPS con upstreams de allowlist, servicio stale durante caídas y disco acotado por LRU para artefactos de registros.
     uk: HTTPS-кешувальний проксі з апстрімами за allowlist, віддачею stale під час аварій і диском з LRU-обмеженням під артефакти реєстрів.
-  version: 0.10.2
-  released: "2026-10-24"
+  version: 0.10.3
+  released: "2026-10-30"
   modified: "2026-10-16"
   visibility: public
 includes:
