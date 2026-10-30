@@ -35,3 +35,9 @@ map $new $redirect_query {
     default         "";
     ~\?([^#\r\n]*)$    $1;
 }
+
+# Query with its leading question mark, or nothing when the target has none.
+map $redirect_query $redirect_qs {
+    default "?$redirect_query";
+    ""      "";
+}

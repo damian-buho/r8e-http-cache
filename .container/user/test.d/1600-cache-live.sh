@@ -64,6 +64,8 @@ http {
         location = /redir { return 301 'https://${_self}:${_up_tls}/final'; }
         location = /redir-q { return 301 'https://${_self}:${_up_tls}/final?from=redir-q'; }
         location = /final { return 200 'final-body'; }
+        location = /at@file { return 200 'at-body'; }
+        location = /redir-enc { return 301 'https://${_self}:${_up_tls}/at%40file?q=%2F'; }
     }
 }
 EOF
@@ -105,6 +107,14 @@ EOF
   check "$(fetch "http://127.0.0.1:${_port}/${_self}:${_up_tls}/redir-q" "${_tmp}/redir_q")" "200" "query redirect lands on 200"
   check "$(cat "${_tmp}/redir_q")" "final-body" "query redirect serves final body"
   check "$(grep -cF "GET /final?from=redir-q " "${_tmp}/upstream-access.log" || true)" "1" "upstream saw redirect query"
+
+  # Percent-encoding survives byte-identical on the direct fetch and across a redirect hop.
+  check "$(fetch "http://127.0.0.1:${_port}/${_self}:${_up_tls}/at%40file?q=%2F" "${_tmp}/enc")" "200" "encoded path fetch is 200"
+  check "$(cat "${_tmp}/enc")" "at-body" "encoded path serves its body"
+  check "$(grep -cF "GET /at%40file?q=%2F " "${_tmp}/upstream-access.log" || true)" "1" "upstream saw the encoded path once"
+  check "$(fetch "http://127.0.0.1:${_port}/${_self}:${_up_tls}/redir-enc" "${_tmp}/redir_enc")" "200" "encoded redirect lands on 200"
+  check "$(cat "${_tmp}/redir_enc")" "at-body" "encoded redirect serves its body"
+  check "$(grep -cF "GET /at%40file?q=%2F " "${_tmp}/upstream-access.log" || true)" "2" "upstream saw the encoded redirect target"
 
   # A warm entry keeps serving after the origin dies.
   nginx -c "${_tmp}/upstream.conf" -s stop

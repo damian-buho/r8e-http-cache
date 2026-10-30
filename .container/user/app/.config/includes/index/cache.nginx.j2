@@ -19,16 +19,8 @@ SPDX-License-Identifier: MIT
 
     # Server level so @redirect inherits it and chains multiple hops
     error_page 301 302 303 307 308 = @redirect;
-    # Split the raw URI so encoding survives; rest keeps path and query as one
-    set $upstream_host "";
-    set $upstream_port "";
-    set $upstream_path "";
-    set $upstream_rest "";
-    if ($request_uri ~ "^/([^/?:]+)(:[0-9]+)?((/[^?]*)?(\?(.*))?)$") {
-        set $upstream_host $1;
-        set $upstream_port $2;
-        set $upstream_rest $3;
-        set $upstream_path $4;
+    # Named captures keep the raw bytes; numbered ones are URI-escaped by set
+    if ($request_uri ~ "^/(?<upstream_host>[^/?:]+)(?<upstream_port>:[0-9]+)?(?<upstream_rest>(?<upstream_path>/[^?]*)?(?:\?.*)?)$") {
     }
 
     # ------------------------------------------------------------------
@@ -113,12 +105,9 @@ SPDX-License-Identifier: MIT
             return 403;
         }
 
-        # proxy_pass with a variable reuses the original URI on error_page entry.
-        # The args assignment precedes the rewrite since break halts the phase.
-        set $args $redirect_query;
-        rewrite ^.*$ $redirect_path break;
+        # A full-URL variable is sent as written; rewrite would re-escape the path
         proxy_cache_key "$scheme$redirect_target$slice_range";
-        proxy_pass https://$redirect_host$redirect_port;
+        proxy_pass https://$redirect_host$redirect_port$redirect_path$redirect_qs;
         proxy_set_header Host $redirect_host$redirect_port;
         proxy_set_header Range $slice_range;
         proxy_ssl_name $redirect_host;

@@ -18,7 +18,7 @@ Nginx-based generic HTTP caching proxy.
 
 ## URL format
 
-`/{host}[:port]/{path}` — the first path segment is used as the upstream host. It is split off `$request_uri` (not `$uri`) so percent-encoding survives byte-identical, and path plus query forward as one part with no arg re-append.
+`/{host}[:port]/{path}` — the first path segment is used as the upstream host. It is split off `$request_uri` (not `$uri`) by NAMED captures, since numbered ones read through `set` are URI-escaped, so percent-encoding survives byte-identical, and path plus query forward as one part with no arg re-append.
 
 - Upstreams are https only. Plain-http origins are out of scope: an http leg would let a MITM poison the cache, so there is no scheme selector. Non-https redirect targets are refused.
 - A bare `/` returns 400 via `location = /`; unparsable shapes (bad ports, `//` prefixes) fall through to the same 400 inside `location /`.
@@ -27,7 +27,7 @@ Nginx-based generic HTTP caching proxy.
 
 - 301/302/303/307/308 are followed internally via a server-level `error_page`, so chains work across hops. Each hop appends a marker and the sixth returns 508, which terminates loops.
 - Every redirect target clears the same policy as a direct fetch: https only, same allowlist, same interior/metadata block. Relative `/path` targets resolve against the original upstream; anything else unusable is a 502.
-- Target splitting lives in `map` blocks (`includes/http/146-redirect.nginx`): `proxy_pass` with a variable reuses the original URI on `error_page` entry, so `@redirect` rewrites to the target path first and caches under its own key.
+- Target splitting lives in `map` blocks (`includes/http/146-redirect.nginx`): `proxy_pass` with a variable reuses the original URI on `error_page` entry, so `@redirect` passes host, port, path and query as one full-URL variable and caches under its own key. Never `rewrite` there: it stores the path unescaped and nginx re-escapes `%` on send (`%40` becomes `%2540`).
 - gixy gates the rendered config: redirect captures exclude CR/LF and the request split stays at server level, so keep both shapes when editing.
 
 ## Cache tuning ENV
