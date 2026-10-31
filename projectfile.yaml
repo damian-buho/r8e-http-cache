@@ -15,8 +15,8 @@ identity:
     en: HTTPS caching proxy based on nginx, with allowlisted upstreams, stale serving during outages, and LRU-bounded disk sized for registry artifacts.
     es: Proxy de caché HTTPS basado en nginx, con upstreams de allowlist, servicio stale durante caídas y disco acotado por LRU para artefactos de registros.
     uk: HTTPS-кешувальний проксі на основі nginx, з апстрімами за allowlist, віддачею stale під час аварій і диском з LRU-обмеженням під артефакти реєстрів.
-  version: 0.10.4
-  released: "2026-10-30"
+  version: 0.10.5
+  released: "2026-10-31"
   modified: "2026-10-16"
   visibility: public
 includes:
