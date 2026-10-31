@@ -93,3 +93,4 @@ LABEL traefik.http.services.r8e-http-cache.loadbalancer.server.port=${O9S_NGINX_
 LABEL ofelia.job-exec.http-cache-warmup.command="cache-warmup"
 LABEL ofelia.job-exec.http-cache-warmup.no-overlap="true"
 LABEL ofelia.job-exec.http-cache-warmup.schedule="@daily"
+LABEL ofelia.job-exec.http-cache-warmup.user="${B19_UID}"
