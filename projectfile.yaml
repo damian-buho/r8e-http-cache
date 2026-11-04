@@ -21,13 +21,13 @@ identity:
   visibility: public
 includes:
   - .makefile/b19/ci.yaml
+  - .makefile/b19/images/nginx.yaml
   - .makefile/b19/traits/image/attested.yaml
   - .makefile/b19/traits/image/signed.yaml
   - .makefile/b19/traits/image/torrent.yaml
   - .makefile/container/traits/audit/nginx.yaml
   - .makefile/container/traits/image/malware-scan.yaml
   - .makefile/container/traits/readme/service.yaml
-  - .makefile/library/images/nginx.yaml
   - .projectfile/vulnerabilities.yaml
   - https://kiota.ch/damian-buho/metadata/raw/branch/main/forge/github.yaml
   - https://kiota.ch/damian-buho/metadata/raw/branch/main/include.yaml
