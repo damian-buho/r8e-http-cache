@@ -21,6 +21,7 @@ ARG B19_VERBOSITY
 ARG TARGETARCH
 
 ENV O9S_NGINX_INDEX_TYPE=cache                      \
+    O9S_NGINX_CACHE_PATH=/app/cache                 \
     O9S_NGINX_ACCESS_LOG="/dev/stdout cache"        \
     O9S_NGINX_PROXY_BUFFERS_NUM=32                  \
     O9S_NGINX_PROXY_BUFFERS_SIZE=64k                \

@@ -33,6 +33,7 @@ Nginx-based generic HTTP caching proxy.
 ## Cache tuning ENV
 
 - `O9S_NGINX_INDEX_TYPE=cache`
+- `O9S_NGINX_CACHE_PATH=/app/cache`, the volume mount; the base default is under the `/tmp` tmpfs, which a read-only root needs and which would leave the volume unused
 - `O9S_NGINX_PROXY_CACHE_VALID_200=90d`
 - `O9S_NGINX_PROXY_CACHE_INACTIVE=90d`
 - `O9S_NGINX_PROXY_CACHE_LOCK=on`, `_REVALIDATE=on`, full `_USE_STALE` error set (see contract below)
