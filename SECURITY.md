@@ -69,5 +69,5 @@ depends on an upstream release, or the advisory does not apply to this project):
 
 | ID | Reason |
 | --- | --- |
-| CVE-2026-42055 | nginx `ngx_http_proxy_v2/grpc` heap buffer overflow; fixable only via upstream nginx release |
-| CVE-2026-42530 | nginx ngx_http_v3 vulnerability; fixable only via upstream nginx release |
+| [CVE-2026-42055](https://nvd.nist.gov/vuln/detail/CVE-2026-42055) | nginx `ngx_http_proxy_v2/grpc` heap buffer overflow; fixable only via upstream nginx release |
+| [CVE-2026-42530](https://nvd.nist.gov/vuln/detail/CVE-2026-42530) | nginx ngx_http_v3 vulnerability; fixable only via upstream nginx release |
